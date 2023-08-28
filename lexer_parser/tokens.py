@@ -12,7 +12,7 @@ list_built_function=[
     {"key":"walk_2_D","args":2,"type_1":"value","type_2":"direction"},
     {"key":"walk_2_O","args":2,"type_1":"value","type_2":"orientation"}
 ]
-    
+
 direction=[]
 orientation=[]
 
@@ -35,7 +35,7 @@ def search_list_dict(list_dict_variables,target):
             return True
     return False
 
-def extract_code_blocks(tokens):
+def extract_code_blocks(tokens):#Extrae bloque de codigo delimitados por {}
     code_blocks = []
     block = []
     depth = 0
@@ -55,7 +55,25 @@ def extract_code_blocks(tokens):
     return code_blocks
 
 def built_in_functions_analyzer(tokens):
-    pass    
+    pass
+
+def check_token_sequence(tokens):
+    result = False 
+    tokens=list(tokens)
+    for i in range(0,len(tokens)-3):
+        print(tokens[i].string)
+        if tokens[i].type == tokenize.NAME:
+            if tokens[i+1].type == tokenize.OP and tokens[i+1].string == ',':
+                result = True
+            else:
+                return False
+            
+        elif tokens[i].type == tokenize.OP and tokens[i].string == ',':
+            if tokens[i+1].type == tokenize.NAME:
+                result = True
+            else:
+                return False
+    return result
 
 def parse_definition(tokens, index):
 
@@ -85,9 +103,13 @@ def parse_definition(tokens, index):
         elif tokens[index].string == 'defProc':#Definimos la sintaxis y semantica para la defincion de las funciones
             
             if tokens[index+1].type == tokenize.NAME:
-                if tokens[index+2].string == "(" and tokens[index+3].string == ")":
+                if tokens[index+2].string == "(" and tokens[index].line[-1] == ")":
 
-                    list_procedures.append(tokens[index+1].string+" "+"()")
+                    #list_procedures.append(tokens[index+1].string+" "+"()")
+                    string_proc = tokenize.tokenize(BytesIO(tokens[index].string.strip(f'defProc {tokens[index+1].string}').strip('(').strip(')').replace(" ","").encode('utf-8')).readline)
+                    
+                    if check_token_sequence(string_proc):
+                        pass
                     
                     if tokens[index+4].string == "{":
                         pass

@@ -1,1 +1,2 @@
-defVar num num
+defVar num 0
+defVar gol num

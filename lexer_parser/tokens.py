@@ -5,7 +5,7 @@ import tokenize
 from io import BytesIO
 
 list_dict_variables=[]
-list_function=[]
+list_procedures=[]
 
 def tokenize_text_from_file(file_path):
     with open(file_path, 'r', encoding='utf-8') as file:
@@ -54,9 +54,14 @@ def parse_definition(tokens, index):
         elif tokens[index].string == 'defProc':#Definimos la sintaxis y semantica para la defincion de las funciones
             
             if tokens[index+1].type == tokenize.NAME:
-                list_function.append(tokens[index+1].string)
-            
-    
+                if tokens[index+2].string == "(" and tokens[index+3].string == ")":
+
+                    list_procedures.append(tokens[index+1].string+" "+"()")
+                else:
+                    return False
+                
+            else:
+                return False
     return True
 
 #TokenInfo(type=63 (ENCODING), string='utf-8', start=(0, 0), end=(0, 0), line='')
@@ -70,9 +75,17 @@ def parse_execution(tokens):
         
 
 tokens = tokenize_text_from_file("/home/keith/Downloads/LYM_PROY_0/sample_sample.txt")
+#try:
+#    print(parse_execution(tokens))
+#except:
+#    print("False")
 print(parse_execution(tokens))
 #parse_execution(tokens)
 
+"""
+parse_execution(tokens)
+print(list_procedures)
+"""
 
 
 

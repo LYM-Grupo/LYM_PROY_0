@@ -1,2 +1,1 @@
-defVar num 0
-defVar gol num
+defProc false a

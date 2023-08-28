@@ -6,6 +6,15 @@ from io import BytesIO
 
 list_dict_variables=[]
 list_procedures=[]
+list_built_function=[   
+    {"key":"jump","args":2,"type_1":"value"},
+    {"key":"walk_1","args":1,"type_1":"value"},
+    {"key":"walk_2_D","args":2,"type_1":"value","type_2":"direction"},
+    {"key":"walk_2_O","args":2,"type_1":"value","type_2":"orientation"}
+]
+    
+direction=[]
+orientation=[]
 
 def tokenize_text_from_file(file_path):
     with open(file_path, 'r', encoding='utf-8') as file:
@@ -25,6 +34,28 @@ def search_list_dict(list_dict_variables,target):
         if str(target) in dict:
             return True
     return False
+
+def extract_code_blocks(tokens):
+    code_blocks = []
+    block = []
+    depth = 0
+
+    for token in tokens:
+        if token.string == '{':
+            depth += 1
+            if depth == 1:
+                block = []
+        elif token.string == '}':
+            depth -= 1
+            if depth == 0:
+                code_blocks.append(block)
+        elif depth > 0:
+            block.append(token)
+
+    return code_blocks
+
+def built_in_functions_analyzer(tokens):
+    pass    
 
 def parse_definition(tokens, index):
 
@@ -57,6 +88,9 @@ def parse_definition(tokens, index):
                 if tokens[index+2].string == "(" and tokens[index+3].string == ")":
 
                     list_procedures.append(tokens[index+1].string+" "+"()")
+                    
+                    if tokens[index+4].string == "{":
+                        pass
                 else:
                     return False
                 
@@ -79,7 +113,9 @@ tokens = tokenize_text_from_file("/home/keith/Downloads/LYM_PROY_0/sample_sample
 #    print(parse_execution(tokens))
 #except:
 #    print("False")
-print(parse_execution(tokens))
+
+#print(parse_execution(tokens))
+
 #parse_execution(tokens)
 
 """

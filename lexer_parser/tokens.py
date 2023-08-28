@@ -5,7 +5,7 @@ import tokenize
 from io import BytesIO
 
 list_dict_variables=[]
-list
+list_function=[]
 
 def tokenize_text_from_file(file_path):
     with open(file_path, 'r', encoding='utf-8') as file:
@@ -54,8 +54,8 @@ def parse_definition(tokens, index):
         elif tokens[index].string == 'defProc':#Definimos la sintaxis y semantica para la defincion de las funciones
             
             if tokens[index+1].type == tokenize.NAME:
-                pass
-    
+                list_function.append(tokens[index+1].string)
+            
     
     return True
 

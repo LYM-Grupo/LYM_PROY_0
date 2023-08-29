@@ -56,7 +56,7 @@ def extract_code_blocks(tokens):#Extrae bloque de codigo delimitados por {}
 def built_in_functions_analyzer(tokens):
     pass
 
-def check_token_sequence(tokens):
+def check_token_sequence_defProc(tokens):
     result = False 
     for i in range(0,len(tokens)-3):
         print(tokens[i].string)
@@ -112,12 +112,12 @@ def parse_definition(tokens, index):
 
                         string_proc = list(tokenize.tokenize(BytesIO(string_modified.encode('utf-8')).readline))
 
-                        if check_token_sequence(string_proc):
+                        if check_token_sequence_defProc(string_proc):
 
                             list_procedures.append({tokens[index+1].string:string_modified.split(',')})
                         else:
                             return False
-                        
+                    #Aca se define el parser del inicio del procedimiento 
                     #if tokens[index+4].string == "{":
                         #pass
                 else:

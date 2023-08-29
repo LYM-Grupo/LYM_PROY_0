@@ -43,16 +43,23 @@ def extract_code_blocks(tokens):#Extrae bloque de codigo delimitados por {}
         if token.string == '{':
             depth += 1
             if depth == 1:
-                block = []
+                block = [token]
         elif token.string == '}':
             depth -= 1
             if depth == 0:
+                block.append(token)
                 code_blocks.append(block)
         elif depth > 0:
             block.append(token)
 
     return code_blocks
 
+def search_position(list_block,target_coordinate)->bool:
+    for i in list_block:
+        for j in i:
+            if j.start == target_coordinate:
+                return True
+    return False
 
 def built_in_functions_analyzer(tokens):
     pass
@@ -111,6 +118,9 @@ def parse_definition(tokens, index):
 
                         list_procedures.append({tokens[index+1].string:[]})
                         
+                        cordenadas = (tokens[index].start[0]+1,0)
+                        print(cordenadas)
+
                         if tokens[index+4].string == '{':#si tiene el mismo identificador que el del procedmiento asi sea sumandole 1 al start y end
                             pass
 
@@ -122,8 +132,11 @@ def parse_definition(tokens, index):
 
                         if check_token_sequence_defProc(string_proc):
 
-                            list_procedures.append({tokens[index+1].string:string_modified.split(',')})
-                            
+                            list_procedures.append({tokens[index+1].string:string_modified.replace('\n','').split(',')})
+
+                            cordenadas = (tokens[index].start[0]+1,0)
+                            print(cordenadas)        
+
                             if tokens[index+4].string == '{':
                                 pass
                             
@@ -150,23 +163,18 @@ def parse_execution(tokens):
         index+=1
     return True
         
-
-tokens = tokenize_text_from_file("/home/keith/Downloads/LYM_PROY_0/sample_program.txt")
+# mac : /Users/fodepixofarfan/Downloads/LYM_PROY_0/sample_program.txts
+# linux : /home/keith/Downloads/LYM_PROY_0/sample_program.txt
+tokens = tokenize_text_from_file("/Users/fodepixofarfan/Downloads/LYM_PROY_0/sample_sample.txt")
 #try:
 #    print(parse_execution(tokens))
 #except:
 #    print("False")
 list_block=extract_code_blocks(tokens)
-for i in list_block:
-    print(i)
-    print('\n')
+print(search_position(list_block,(2,0)))
 #print(parse_execution(tokens))
-
-
+#print(list_procedures)
 """
 parse_execution(tokens)
 print(list_procedures)
 """
-
-
-

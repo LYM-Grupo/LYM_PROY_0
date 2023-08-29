@@ -1,2 +1,7 @@
-defProc putCB ( a ,b , c )
+defProc putCB (c , b )
+{
+drop( c ) ;
+letGo ( b ) ;
+walk( n )
+}
 

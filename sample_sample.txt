@@ -1,1 +1,2 @@
-defVar nom 1
+defProc putCB ( a ,b , c )
+

@@ -21,7 +21,6 @@ def tokenize_text_from_file(file_path):
         text = file.read()
     token_generator = tokenize.tokenize(BytesIO(text.encode('utf-8')).readline)
     filtered_token_generator=[]
-
     filters=[tokenize.NEWLINE ,tokenize.INDENT , tokenize.DEDENT , tokenize.NL]#Borra las indentaciones, saltos de linea, espacios, etc. 
     for token in token_generator:
         if token.type not in filters:
@@ -59,7 +58,6 @@ def built_in_functions_analyzer(tokens):
 
 def check_token_sequence(tokens):
     result = False 
-    tokens=list(tokens)
     for i in range(0,len(tokens)-3):
         print(tokens[i].string)
         if tokens[i].type == tokenize.NAME:
@@ -74,7 +72,7 @@ def check_token_sequence(tokens):
             else:
                 return False
     return result
-
+#print(check_token_sequence(tokenize.tokenize(BytesIO("".encode('utf-8')).readline)))
 def parse_definition(tokens, index):
 
     if tokens[index].string in ['defVar', 'defProc']:#Definimos el procedimiento para verificar las definiciones de las funciones y las variables 
@@ -103,16 +101,25 @@ def parse_definition(tokens, index):
         elif tokens[index].string == 'defProc':#Definimos la sintaxis y semantica para la defincion de las funciones
             
             if tokens[index+1].type == tokenize.NAME:
-                if tokens[index+2].string == "(" and tokens[index].line[-1] == ")":
+                if tokens[index+2].string == "(" and tokens[index].line.strip()[-1] == ")":
 
-                    #list_procedures.append(tokens[index+1].string+" "+"()")
-                    string_proc = tokenize.tokenize(BytesIO(tokens[index].string.strip(f'defProc {tokens[index+1].string}').strip('(').strip(')').replace(" ","").encode('utf-8')).readline)
-                    
-                    if check_token_sequence(string_proc):
-                        pass
-                    
-                    if tokens[index+4].string == "{":
-                        pass
+                    string_modified= tokens[index].line.replace('defProc','').replace(str(tokens[index+1].string),'').replace('(','').replace(')','').replace(" ","")
+                
+                    if len(string_modified)==0:
+
+                        list_procedures.append({tokens[index+1].string:[]})
+                    else:
+
+                        string_proc = list(tokenize.tokenize(BytesIO(string_modified.encode('utf-8')).readline))
+
+                        if check_token_sequence(string_proc):
+
+                            list_procedures.append({tokens[index+1].string:string_modified.split(',')})
+                        else:
+                            return False
+                        
+                    #if tokens[index+4].string == "{":
+                        #pass
                 else:
                     return False
                 
@@ -136,7 +143,7 @@ tokens = tokenize_text_from_file("/home/keith/Downloads/LYM_PROY_0/sample_sample
 #except:
 #    print("False")
 
-#print(parse_execution(tokens))
+print(parse_execution(tokens))
 
 #parse_execution(tokens)
 

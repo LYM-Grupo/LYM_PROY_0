@@ -53,13 +53,14 @@ def extract_code_blocks(tokens):#Extrae bloque de codigo delimitados por {}
 
     return code_blocks
 
+
 def built_in_functions_analyzer(tokens):
     pass
 
 def check_token_sequence_defProc(tokens):
     result = False 
     for i in range(0,len(tokens)-3):
-        print(tokens[i].string)
+
         if tokens[i].type == tokenize.NAME:
             if tokens[i+1].type == tokenize.OP and tokens[i+1].string == ',':
                 result = True
@@ -104,11 +105,17 @@ def parse_definition(tokens, index):
                 if tokens[index+2].string == "(" and tokens[index].line.strip()[-1] == ")":
 
                     string_modified= tokens[index].line.replace('defProc','').replace(str(tokens[index+1].string),'').replace('(','').replace(')','').replace(" ","")
-                
+
+                    
                     if len(string_modified)==0:
 
                         list_procedures.append({tokens[index+1].string:[]})
-                        #
+                        
+                        if tokens[index+4].string == '{':#si tiene el mismo identificador que el del procedmiento asi sea sumandole 1 al start y end
+                            pass
+
+                        else:
+                            return False
                     else:
 
                         string_proc = list(tokenize.tokenize(BytesIO(string_modified.encode('utf-8')).readline))
@@ -116,7 +123,12 @@ def parse_definition(tokens, index):
                         if check_token_sequence_defProc(string_proc):
 
                             list_procedures.append({tokens[index+1].string:string_modified.split(',')})
-                            #
+                            
+                            if tokens[index+4].string == '{':
+                                pass
+                            
+                            else:
+                                return False
                         else:
                             return False
                     #Aca se define el parser del inicio del procedimiento 
@@ -144,8 +156,11 @@ tokens = tokenize_text_from_file("/home/keith/Downloads/LYM_PROY_0/sample_progra
 #    print(parse_execution(tokens))
 #except:
 #    print("False")
-
-print(parse_execution(tokens))
+list_block=extract_code_blocks(tokens)
+for i in list_block:
+    print(i)
+    print('\n')
+#print(parse_execution(tokens))
 
 
 """

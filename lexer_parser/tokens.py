@@ -108,6 +108,7 @@ def parse_definition(tokens, index):
                     if len(string_modified)==0:
 
                         list_procedures.append({tokens[index+1].string:[]})
+                        #
                     else:
 
                         string_proc = list(tokenize.tokenize(BytesIO(string_modified.encode('utf-8')).readline))
@@ -115,6 +116,7 @@ def parse_definition(tokens, index):
                         if check_token_sequence_defProc(string_proc):
 
                             list_procedures.append({tokens[index+1].string:string_modified.split(',')})
+                            #
                         else:
                             return False
                     #Aca se define el parser del inicio del procedimiento 
@@ -137,7 +139,7 @@ def parse_execution(tokens):
     return True
         
 
-tokens = tokenize_text_from_file("/home/keith/Downloads/LYM_PROY_0/sample_sample.txt")
+tokens = tokenize_text_from_file("/home/keith/Downloads/LYM_PROY_0/sample_program.txt")
 #try:
 #    print(parse_execution(tokens))
 #except:
@@ -145,7 +147,6 @@ tokens = tokenize_text_from_file("/home/keith/Downloads/LYM_PROY_0/sample_sample
 
 print(parse_execution(tokens))
 
-#parse_execution(tokens)
 
 """
 parse_execution(tokens)

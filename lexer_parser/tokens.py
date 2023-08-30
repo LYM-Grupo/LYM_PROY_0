@@ -130,10 +130,7 @@ def parse_definition(tokens, index):
                         if check_token_sequence_defProc(string_proc):
 
                             list_procedures.append({tokens[index+1].string:string_modified.replace('\n','').split(',')})
-
-                            cordenadas = (tokens[index].start[0]+1,0)
-                            print(cordenadas)        
-                            
+                                 
                             search_position_variable = search_position(list_block,(tokens[index].start[0]+1,0))
                             if search_position_variable[0]:
                                 pass

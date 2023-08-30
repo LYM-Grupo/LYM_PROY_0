@@ -54,15 +54,12 @@ def extract_code_blocks(tokens):#Extrae bloque de codigo delimitados por {}
 
     return code_blocks
 
-def search_position(list_block,target_coordinate)->bool:
+def search_position(list_block,target_coordinate):
     for i in list_block:
         for j in i:
             if j.start == target_coordinate:
-                return True
-    return False
-
-def built_in_functions_analyzer(tokens):
-    pass
+                return True,i
+    return False,i
 
 def check_token_sequence_defProc(tokens):
     result = False 
@@ -81,6 +78,8 @@ def check_token_sequence_defProc(tokens):
                 return False
     return result
 #print(check_token_sequence(tokenize.tokenize(BytesIO("".encode('utf-8')).readline)))
+def parse_definition_defProc():
+    pass
 def parse_definition(tokens, index):
 
     if tokens[index].string in ['defVar', 'defProc']:#Definimos el procedimiento para verificar las definiciones de las funciones y las variables 
@@ -118,10 +117,8 @@ def parse_definition(tokens, index):
 
                         list_procedures.append({tokens[index+1].string:[]})
                         
-                        cordenadas = (tokens[index].start[0]+1,0)
-                        print(cordenadas)
-
-                        if tokens[index+4].string == '{':#si tiene el mismo identificador que el del procedmiento asi sea sumandole 1 al start y end
+                        search_position_variable=search_position(list_block,(tokens[index].start[0]+1,0))
+                        if search_position_variable[0]:#si tiene el mismo identificador que el del procedmiento asi sea sumandole 1 al start y end
                             pass
 
                         else:
@@ -136,10 +133,10 @@ def parse_definition(tokens, index):
 
                             cordenadas = (tokens[index].start[0]+1,0)
                             print(cordenadas)        
-
-                            if tokens[index+4].string == '{':
-                                pass
                             
+                            search_position_variable = search_position(list_block,(tokens[index].start[0]+1,0))
+                            if search_position_variable[0]:
+                                pass
                             else:
                                 return False
                         else:
@@ -165,14 +162,14 @@ def parse_execution(tokens):
         
 # mac : /Users/fodepixofarfan/Downloads/LYM_PROY_0/sample_program.txts
 # linux : /home/keith/Downloads/LYM_PROY_0/sample_program.txt
-tokens = tokenize_text_from_file("/Users/fodepixofarfan/Downloads/LYM_PROY_0/sample_sample.txt")
+tokens = tokenize_text_from_file("/home/keith/Downloads/LYM_PROY_0/sample_sample.txt")
 #try:
 #    print(parse_execution(tokens))
 #except:
 #    print("False")
 list_block=extract_code_blocks(tokens)
-print(search_position(list_block,(2,0)))
-#print(parse_execution(tokens))
+#print(search_position(list_block,(2,0)))
+print(parse_execution(tokens))
 #print(list_procedures)
 """
 parse_execution(tokens)

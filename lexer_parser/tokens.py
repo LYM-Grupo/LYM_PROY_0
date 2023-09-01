@@ -4,7 +4,7 @@
 import tokenize
 from io import BytesIO
 
-values_parameters=[]
+values_parameters=[{"orientation":["north","south","east","west"]},{"direction":["left","right","around"]}]
 list_dict_variables=[]
 list_procedures=[]
 list_built_function=[   

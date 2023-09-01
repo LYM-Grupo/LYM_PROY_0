@@ -24,9 +24,6 @@ list_built_function=[
     {"key":"nop","args":0,"type_1":"None"}
 ]
 
-direction=[]
-orientation=[]
-
 def tokenize_text_from_file(file_path):
     with open(file_path, 'r', encoding='utf-8') as file:
         text = file.read()

@@ -4,13 +4,24 @@
 import tokenize
 from io import BytesIO
 
+values_parameters=[]
 list_dict_variables=[]
 list_procedures=[]
 list_built_function=[   
     {"key":"jump","args":2,"type_1":"value"},
-    {"key":"walk_1","args":1,"type_1":"value"},
-    {"key":"walk_2_D","args":2,"type_1":"value","type_2":"direction"},
-    {"key":"walk_2_O","args":2,"type_1":"value","type_2":"orientation"}
+    {"key":"walk","args":1,"type_1":"value"},
+    {"key":"walk","args":2,"type_1":"value","type_2":"direction"},
+    {"key":"walk","args":2,"type_1":"value","type_2":"orientation"},
+    {"key":"leap","args":1,"type_1":"value"},
+    {"key":"leap","args":2,"type_1":"value","type_2":"direction"},
+    {"key":"leap","args":2,"type_1":"value","type_2":"direction"},
+    {"key":"turn","args":1,"type_1":"direction"},
+    {"key":"turnto","args":1,"type_1":"orientation"},
+    {"key":"drop","args":1,"type_1":"value"},
+    {"key":"get","args":1,"type_1":"value"},
+    {"key":"grab","args":2,"type_1":"value"},
+    {"key":"letGo","args":1,"type_1":"value"},
+    {"key":"nop","args":0,"type_1":"None"}
 ]
 
 direction=[]
@@ -79,7 +90,7 @@ def check_token_sequence_defProc(tokens):
     return result
 #print(check_token_sequence(tokenize.tokenize(BytesIO("".encode('utf-8')).readline)))
 def parse_definition_defProc():
-    pass
+    result="Hola"
 def parse_definition(tokens, index):
 
     if tokens[index].string in ['defVar', 'defProc']:#Definimos el procedimiento para verificar las definiciones de las funciones y las variables 

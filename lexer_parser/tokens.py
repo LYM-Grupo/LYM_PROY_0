@@ -25,6 +25,42 @@ list_dict_built_in_function=[
     {"key":"nop","args":0,"type_1":"None"}
 ]
 
+def verify_types(x,list_string_modified,defProc):        
+    for z in range(0,len(x)):
+        if x[z]["args"] == 1:
+
+            if x[z]["type_1"] == "value" and not(list_string_modified[0] in dict_variables.keys() or list_string_modified[0] in dict_procedures[defProc]):
+                return False
+            
+            elif x[z]["type_1"] == "orientation" and not(list_string_modified[0].lower() in values_parameters["orientation"]):
+                return False
+            
+            elif x[z]["type_1"] == "direction" and not(list_string_modified[0].lower() in values_parameters["direction"]):
+                return False
+
+        elif x[z]["args"] == 2:
+
+            if x[z]["type_1"] == "value" and not(list_string_modified[0] in dict_variables.keys() or list_string_modified[0] in dict_procedures[defProc]):
+
+                if x[z]["type_1"] == "value" and not(list_string_modified[0] in dict_variables.keys() or list_string_modified[0] in dict_procedures[defProc]):
+                    return False
+                
+                elif x[z]["type_1"] == "orientation" and not(list_string_modified[0].lower() in values_parameters["orientation"]):
+                    return False
+                
+                elif x[z]["type_1"] == "direction" and not(list_string_modified[0].lower() in values_parameters["direction"]):
+                    return False
+            
+            elif x[z]["type_1"] == "orientation" and not(list_string_modified[0].lower() in values_parameters["orientation"]):
+                return False
+            
+            elif x[z]["type_1"] == "direction" and not(list_string_modified[0].lower() in values_parameters["direction"]):
+                return False
+            
+        else:
+            return False
+    return True
+
 def search_list_dict_built_in_function(key,list_dict,len_arguments):
     list_posibilities=[] 
     for i in list_dict:
@@ -90,6 +126,8 @@ def check_token_sequence_defProc(tokens):
     return result
 
 def parse_definition_defProc(list_blocks,list_built_in_function,defProc):
+    #Faltan hacer varias cosas porque las funciones tambien permiten recursion de las misma funcion y llamado de otras funcion dentro de la misma funcion 
+    #Falta otra cosa que es la verificacion del orden de los argumentos de una built-in function
     list_blocks=list_blocks[1:-1]
     if list_blocks[-1].string == ')':
 
@@ -102,7 +140,7 @@ def parse_definition_defProc(list_blocks,list_built_in_function,defProc):
 
                     string_modified = line.replace(list_blocks[i].string,'').replace('(','').replace(')','').replace('\n','').replace(';','')
 
-                    #aca si list string modified es vacio entonces solo se verifica el built in function
+                    #aca si list string modified es vacio entonces solo se verifica el built in function o el procedimiento
                     if len(string_modified) !=0:
                         if check_token_sequence_defProc(list(tokenize.tokenize(BytesIO(string_modified.encode('utf-8')).readline))):
 
@@ -110,6 +148,11 @@ def parse_definition_defProc(list_blocks,list_built_in_function,defProc):
                             
                             x=search_list_dict_built_in_function(list_blocks[i].string,list_dict_built_in_function,len(list_string_modified))
                             if len(x) !=0:#tenemos que verificar que el numero de  argumentos en la funcion sea el correcto
+                             
+                                verify_types(x,list_string_modified,defProc)
+
+                                if len(list_string_modified)==0:
+                                    pass
                                 for j in list_string_modified:#lo indentamos si no funciona 
 
                                     if (j not in dict_variables.keys() or j not in dict_procedures[defProc]):#esta busqueda esta mal
@@ -121,7 +164,7 @@ def parse_definition_defProc(list_blocks,list_built_in_function,defProc):
                         else:
                             return False
                     else:
-                        pass
+                        pass# aca toca hacer algo cuando no hay argumentos 
                 else:
                     
                     return False

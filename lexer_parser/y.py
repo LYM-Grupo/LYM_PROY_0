@@ -1,3 +1,3 @@
-lista=""
-if len(lista)!=0:
+lista="b"
+if not("a" in lista):
     print("Hello")

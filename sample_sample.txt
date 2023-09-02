@@ -1,1 +1,6 @@
-defVar nom 0
+defProc putCB (c , b )
+{
+drop( c ) ;
+letGo ( b ) ;
+walk( n )
+}

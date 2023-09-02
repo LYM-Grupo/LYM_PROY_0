@@ -85,9 +85,15 @@ def check_token_sequence_defProc(tokens):
             else:
                 return False
     return result
-#print(check_token_sequence(tokenize.tokenize(BytesIO("".encode('utf-8')).readline)))
-def parse_definition_defProc():
-    result="Hola"
+
+def parse_definition_defProc(list_blocks,list_built_function):
+    list_blocks=list_blocks[1:-1]
+    if list_blocks[-1] == ')':
+        for i in list_blocks:
+            print(i)
+    else:
+        return False
+
 def parse_definition(tokens, index):
 
     if tokens[index].string in ['defVar', 'defProc']:#Definimos el procedimiento para verificar las definiciones de las funciones y las variables 
@@ -127,8 +133,8 @@ def parse_definition(tokens, index):
                         
                         search_position_variable=search_position(list_block,(tokens[index].start[0]+1,0))
                         if search_position_variable[0]:#si tiene el mismo identificador que el del procedmiento asi sea sumandole 1 al start y end
-                            pass
-
+                            parse_definition_defProc(search_position_variable[1],list_built_function)
+                            
                         else:
                             return False
                     else:
@@ -141,7 +147,7 @@ def parse_definition(tokens, index):
                                  
                             search_position_variable = search_position(list_block,(tokens[index].start[0]+1,0))
                             if search_position_variable[0]:
-                                pass
+                                parse_definition_defProc(search_position_variable[1],list_built_function)
                             else:
                                 return False
                         else:

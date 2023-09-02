@@ -98,10 +98,15 @@ def parse_definition_defProc(list_blocks,list_built_in_function,defProc):
                 
                 if line[-1] == ';' and list_blocks[i+1] == '(' and list_blocks.replace(';','')[-1] == ')':
 
-                    string_modified = line.replace(i.string,'').replace('(','').replace(')','')
+                    string_modified = line.replace(i.string,'').replace('(','').replace(')','').replace('\n','')
+
                     if check_token_sequence_defProc(list(tokenize.tokenize(BytesIO(string_modified.encode('utf-8')).readline))):
-                        for i in string_modified.replace('\n','').split(','):
-                            if i not in list_dict_built_in_function.keys() or i not in list_dict_procedures[defProc]:
+
+                        for i in string_modified.split(','):
+
+                            if i not in list_dict_built_in_function.keys() or i not in list_dict_procedures[defProc]:#esta busqueda esta mal
+                                #es necesario hacer la verificacion de si es north direction y eso pero no es problema lo hago despues de bañarme 
+
                                 return False
                             
                     else:

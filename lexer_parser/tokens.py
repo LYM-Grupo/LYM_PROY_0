@@ -4,8 +4,8 @@
 import tokenize
 from io import BytesIO
 
-values_parameters=[{"orientation":["north","south","east","west"]},{"direction":["left","right","around"]}]
-list_dict_variables=[]
+values_parameters={"orientation":["north","south","east","west"],"direction":["left","right","around"]}
+dict_variables={}
 list_dict_procedures=[]
 list_built_in_function=["jump","walk","leap","turn","turninto","drop","get","grab","letGo","nop"]
 list_dict_built_in_function=[   
@@ -106,7 +106,7 @@ def parse_definition_defProc(list_blocks,list_built_in_function,defProc):
 
                             if i not in list_dict_built_in_function.keys() or i not in list_dict_procedures[defProc]:#esta busqueda esta mal
                                 #es necesario hacer la verificacion de si es north direction y eso pero no es problema lo hago despues de bañarme 
-
+                                
                                 return False
                             
                     else:
@@ -127,13 +127,13 @@ def parse_definition(tokens, index):
 
             if tokens[index+1].type == tokenize.NAME:#la variable tiene que ser de tipo NAME no puede ser operador
 
-                if tokens[index+2].type == tokenize.NAME and search_list_dict(list_dict_variables,tokens[index+2].string):#Si es una variable que es NAME entonces tienes que estar definida anteriormente
-                                                           
-                    list_dict_variables.append({str(tokens[index+1].string):tokens[index+2].string})
+                if tokens[index+2].type == tokenize.NAME and tokens[index+2].string in dict_variables.keys():#search_list_dict(list_dict_variables,tokens[index+2].string):#Si es una variable que es NAME entonces tienes que estar definida anteriormente
+                    dict_variables[str(tokens[index+1].string)] = tokens[index+2].string
+                    #list_dict_variables.append({str(tokens[index+1].string):tokens[index+2].string})
                     
                 elif tokens[index+2].type == tokenize.NUMBER:#Si es numero 
-
-                    list_dict_variables.append({str(tokens[index+1].string):tokens[index+2].string})
+                    dict_variables[str(tokens[index+1].string)] = tokens[index+2].string
+                    #list_dict_variables.append({str(tokens[index+1].string):tokens[index+2].string})
                     
                 else:
                     

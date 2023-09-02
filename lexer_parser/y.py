@@ -1,3 +1,2 @@
-text="defProc putCB ( 5 ,1 , 2 )"
-
-print()
+text="a,b,c ,d"
+print(text.split(','))

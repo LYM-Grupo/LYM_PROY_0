@@ -1,3 +1,8 @@
+defVar nom 0
+defVar x 0
+defVar y 0
+defVar one 0
+defVar letGo 8
 defProc putCB (c , b )
 {
 drop( c ) ;

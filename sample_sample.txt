@@ -1,6 +1,6 @@
 defProc putCB (c , b )
 {
-drop( w ) ;
+drop( c ) ;
 letGo ( b ) ;
-walk( n )
+walk( north )
 }

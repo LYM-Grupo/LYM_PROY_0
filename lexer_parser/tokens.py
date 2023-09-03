@@ -94,7 +94,6 @@ def extract_code_blocks(tokens):#Extrae bloque de codigo delimitados por {}
                 code_blocks.append(block)
         elif depth > 0:
             block.append(token)
-
     return code_blocks
 
 def search_position(list_block,target_coordinate):
@@ -121,24 +120,27 @@ def check_token_sequence_defProc(tokens):
                 return False
     return result
 
-def parse_definition_defProc(list_blocks,list_built_in_function,defProc):
+def parse_definition_defProc(list_blocks,defProc):
     #Faltan hacer varias cosas porque las funciones tambien permiten recursion de las misma funcion y llamado de otras funcion dentro de la misma funcion 
     #Falta otra cosa que es la verificacion del orden de los argumentos de una built-in function
     list_blocks=list_blocks[1:-1]
     if list_blocks[-1].string == ')':
 
         for i in range(0,len(list_blocks)):
-    
+            
             if list_blocks[i].string in list_built_in_function:
-                line=list_blocks[i].line.replace(' ','')
+            
+                line=list_blocks[i].line.replace(' ','').strip()#Es necesario poner strip para poder leer el ultimo elemento 
                 
-                if line[-1] == ';' and list_blocks[i+1] == '(' and line.replace(';','')[-1] == ')':
+                if line[-1] == ';' and list_blocks[i+1].string == '(' and line.replace(';','')[-1] == ')':
 
                     string_modified = line.replace(list_blocks[i].string,'').replace('(','').replace(')','').replace('\n','').replace(';','')
 
                     #aca si list string modified es vacio entonces solo se verifica el built in function o el procedimiento
                     if len(string_modified) !=0:
-                        if check_token_sequence_defProc(list(tokenize.tokenize(BytesIO(string_modified.encode('utf-8')).readline))):
+                        print(string_modified)
+                        #IMPORTANTE : eliminar check_token_sequence_defProc
+                        if check_token_sequence_defProc(list(tokenize.tokenize(BytesIO(string_modified.encode('utf-8')).readline))):#quitar esto
 
                             list_string_modified = string_modified.split(',') 
                             
@@ -156,7 +158,7 @@ def parse_definition_defProc(list_blocks,list_built_in_function,defProc):
                         if list_blocks[i].string != "nop":
                             return False
                         
-                elif line[-1] == ')' and list_blocks[i+1] == '(' and line.replace(';','')[-1] == ')':
+                elif line[-1] == ')' and list_blocks[i+1].string == '(' and line.replace(';','')[-1] == ')':
 
                     string_modified = line.replace(list_blocks[i].string,'').replace('(','').replace(')','').replace('\n','').replace(';','')
 
@@ -247,7 +249,7 @@ def parse_definition(tokens, index):
                         
                         search_position_variable=search_position(list_block,(tokens[index].start[0]+1,0))
                         if search_position_variable[0]:#si tiene el mismo identificador que el del procedmiento asi sea sumandole 1 al start y end
-                            if not(parse_definition_defProc(search_position_variable[1],list_dict_built_in_function,tokens[index+1].string.lower())):
+                            if not(parse_definition_defProc(search_position_variable[1],tokens[index+1].string.lower())):
                                 return False
                             
                         else:
@@ -263,7 +265,7 @@ def parse_definition(tokens, index):
                                  
                             search_position_variable = search_position(list_block,(tokens[index].start[0]+1,0))
                             if search_position_variable[0]:
-                                if not(parse_definition_defProc(search_position_variable[1],list_dict_built_in_function,tokens[index+1].string.lower())):
+                                if not(parse_definition_defProc(search_position_variable[1],tokens[index+1].string.lower())):
                                     return False
                                        
                             else:
@@ -282,7 +284,7 @@ def parse_execution(tokens):
     index = 1    
     while index < len(tokens)-1:
         if not parse_definition(tokens,index):
-            return parse_definition(tokens,index)
+            return False
         index+=1
     return True
         
@@ -294,7 +296,6 @@ tokens = tokenize_text_from_file("/home/keith/Downloads/LYM_PROY_0/sample_sample
 #except:
 #    print("False")
 list_block=extract_code_blocks(tokens)
-parse_execution(tokens)
 print(parse_execution(tokens))
 #print(list_procedures)
 """

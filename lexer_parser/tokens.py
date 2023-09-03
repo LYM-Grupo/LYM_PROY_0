@@ -106,8 +106,8 @@ def search_position(list_block,target_coordinate):
 def check_token_sequence_defProc(tokens):
     result = False 
     for i in range(0,len(tokens)-3):
-        if tokens[0].type == tokenize.NAME:
-            #AQUI
+        if tokens[1].type == tokenize.NAME:
+            
             if tokens[i].type == tokenize.NAME:
                 if tokens[i+1].type == tokenize.OP and tokens[i+1].string == ',':
                     result = True
@@ -126,17 +126,30 @@ def check_token_sequence_defProc(tokens):
 def check_token_sequence_defProc_brackets(tokens):
     result= False
     for i in range(0,len(tokens)-3):
-        if tokens[0].type == tokenize.NAME or tokens[0].type == tokenize.NUMBER:
+        if tokens[1].type == tokenize.NAME or tokens[1].type == tokenize.NUMBER:
             
-            if tokens[i].type == tokenize.NAME or tokens[i].type == tokenize.NUMBER:
+            if tokens[i].type == tokenize.NAME and tokens[i].string in dict_variables.keys():
+
+                if tokens[i+1].type == tokenize.OP and tokens[i+1].string == ',':
+                    result = True
+                else:
+                    return False
+
+            elif tokens[i].type == tokenize.NUMBER:
+
                 if tokens[i+1].type == tokenize.OP and tokens[i+1].string == ',':
                     result = True
                 else:
                     return False
                 
             elif tokens[i].type == tokenize.OP and tokens[i].string == ',':
-                if tokens[i+1].type == tokenize.NAME or tokens[i+1].type == tokenize.NUMBER:
+
+                if tokens[i+1].type == tokenize.NAME and tokens[i+1].string in dict_variables.keys():
                     result = True
+
+                elif tokens[i+1].type == tokenize.NUMBER:
+                    result = True 
+
                 else:
                     return False
         else:
@@ -329,7 +342,7 @@ tokens = tokenize_text_from_file("/home/keith/Downloads/LYM_PROY_0/sample_sample
 #    print("False")
 list_block=extract_code_blocks(tokens)
 print(parse_execution(tokens))
-print(dict_variables)
+
 """
 parse_execution(tokens)
 print(list_procedures)

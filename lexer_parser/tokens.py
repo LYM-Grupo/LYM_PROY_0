@@ -28,7 +28,7 @@ list_dict_built_in_function=[
 def verify_types(x,list_string_modified,defProc):        
     for z in range(0,len(x)):
         if x[z]["args"] == 1:
-            print(dict_procedures)#IMPORTANTE Esto es mal 
+            #print(dict_procedures)#IMPORTANTE Esto es mal 
             if x[z]["type_1"] == "value" and not(list_string_modified[0] in dict_variables.keys() or list_string_modified[0] in dict_procedures[defProc]):
                 return False
             
@@ -162,20 +162,18 @@ def parse_definition_defProc(list_blocks,defProc):
 
                     #aca si list string modified es vacio entonces solo se verifica el built in function o el procedimiento
                     if len(string_modified) !=0:
-                        if check_token_sequence_defProc(list(tokenize.tokenize(BytesIO(string_modified.encode('utf-8')).readline))):
 
-                            list_string_modified = string_modified.split(',') 
+                        list_string_modified = string_modified.split(',') 
                             
-                            x=search_list_dict_built_in_function(list_blocks[i].string,list_dict_built_in_function,len(list_string_modified))
-                            if len(x) !=0:#tenemos que verificar que el numero de  argumentos en la funcion sea el correcto
+                        x=search_list_dict_built_in_function(list_blocks[i].string,list_dict_built_in_function,len(list_string_modified))
+                        if len(x) !=0:#tenemos que verificar que el numero de  argumentos en la funcion sea el correcto
                              
-                                if not verify_types(x,list_string_modified,defProc.lower()):
-                                    return False
-                                    
-                            else:
+                            if not verify_types(x,list_string_modified,defProc.lower()):
                                 return False
+                                    
                         else:
                             return False
+
                     else:
                         if list_blocks[i].string != "nop":
                             return False
@@ -238,10 +236,10 @@ def parse_definition(tokens, index):
             if tokens[index+1].type == tokenize.NAME:
                 if tokens[index+2].string == "(" and tokens[index].line.strip()[-1] == ")":
 
-                    string_modified= tokens[index].line.lower().replace('defproc','').replace(str(tokens[index+1].string),'').replace('(','').replace(')','').replace(" ","")
+                    string_modified= tokens[index].line.lower().replace('defproc','').replace(tokens[index+1].string.lower(),'').replace('(','').replace(')','').replace(" ","")
 
-                    
                     if len(string_modified)==0:
+                        
                         dict_procedures[tokens[index+1].string.lower()]=[]
                         #list_dict_procedures.append({tokens[index+1].string:[]})
                         

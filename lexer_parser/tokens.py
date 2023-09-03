@@ -128,22 +128,22 @@ def parse_definition_defProc(list_blocks,defProc):
 
         for i in range(0,len(list_blocks)):
             
-            if list_blocks[i].string in list_built_in_function:
+            if list_blocks[i].string.lower() in list_built_in_function:
             
                 line=list_blocks[i].line.replace(' ','').strip()#Es necesario poner strip para poder leer el ultimo elemento 
                 
                 if line[-1] == ';' and list_blocks[i+1].string == '(' and line.replace(';','')[-1] == ')':
 
-                    string_modified = line.replace(list_blocks[i].string,'').replace('(','').replace(')','').replace('\n','').replace(';','')
+                    string_modified = line.replace(list_blocks[i].string.lower(),'').replace('(','').replace(')','').replace('\n','').replace(';','')
 
                     #aca si list string modified es vacio entonces solo se verifica el built in function o el procedimiento
                     if len(string_modified) !=0:
-                        print(string_modified)
+                        
                         #IMPORTANTE : eliminar check_token_sequence_defProc
 
                         list_string_modified = string_modified.split(',') 
                             
-                        x=search_list_dict_built_in_function(list_blocks[i].string,list_dict_built_in_function,len(list_string_modified))
+                        x=search_list_dict_built_in_function(list_blocks[i].string.lower(),list_dict_built_in_function,len(list_string_modified))
                         if len(x) !=0:#tenemos que verificar que el numero de  argumentos en la funcion sea el correcto
                              
                             if not verify_types(x,list_string_modified,defProc):
@@ -153,19 +153,19 @@ def parse_definition_defProc(list_blocks,defProc):
                             return False
 
                     else:
-                        if list_blocks[i].string != "nop":
+                        if list_blocks[i].string.lower() != "nop":
                             return False
                         
                 elif line[-1] == ')' and list_blocks[i+1].string == '(' and line.replace(';','')[-1] == ')':
 
-                    string_modified = line.replace(list_blocks[i].string,'').replace('(','').replace(')','').replace('\n','').replace(';','')
+                    string_modified = line.strip().replace(list_blocks[i].string.lower(),'').replace('(','').replace(')','').replace('\n','').replace(';','')
 
                     #aca si list string modified es vacio entonces solo se verifica el built in function o el procedimiento
                     if len(string_modified) !=0:
 
                         list_string_modified = string_modified.split(',') 
                             
-                        x=search_list_dict_built_in_function(list_blocks[i].string,list_dict_built_in_function,len(list_string_modified))
+                        x=search_list_dict_built_in_function(list_blocks[i].string.lower(),list_dict_built_in_function,len(list_string_modified))
                         if len(x) !=0:#tenemos que verificar que el numero de  argumentos en la funcion sea el correcto
                              
                             if not verify_types(x,list_string_modified,defProc.lower()):
@@ -175,32 +175,44 @@ def parse_definition_defProc(list_blocks,defProc):
                             return False
 
                     else:
-                        if list_blocks[i].string != "nop":
+                        if list_blocks[i].string.lower() != "nop":
                             return False
                 
-            elif list_blocks[i].string in dict_procedures.keys():
+            elif list_blocks[i].string.lower() in dict_procedures.keys():
 
-                line=list_blocks[i].line.replace(' ','')
+                line=list_blocks[i].line.replace(' ','').strip().lower()
 
-                if line[-1] == ';' and list_blocks[i+1] == '(' and line.replace(';','')[-1] == ')':
+                string_modified = line.replace(list_blocks[i].string.lower(),'').replace('(','').replace(')','').replace('\n','').replace(';','')
+                
+                
+                if len(string_modified)!=0:
+                    if line[-1] == ';' and list_blocks[i+1].string == '(' and line.replace(';','')[-1] == ')':
+                        
+                        if not(list_blocks[i].string.lower() == defProc.lower() and len(string_modified.split(',')) == len(dict_procedures[defProc]) and check_token_sequence_defProc(list(tokenize.tokenize(BytesIO(string_modified.encode('utf-8')).readline)))):
+                            return False
+                        
+                        elif not(list_blocks[i].string.lower() in dict_procedures.keys() and len(dict_procedures[list_blocks[i].string.lower()])== len(string_modified.split(',')) and check_token_sequence_defProc(list(tokenize.tokenize(BytesIO(string_modified.encode('utf-8')).readline)))):
+                            return False
+#Falta verificar si las variables estan definidas dentro del procedimiento o son variables globales                         
+                    elif line[-1] == ')' and  list_blocks[i+1].string == '(':
+                        
+                        if not(list_blocks[i].string.lower() == defProc.lower() and len(string_modified.split(',')) == len(dict_procedures[defProc]) and check_token_sequence_defProc(list(tokenize.tokenize(BytesIO(string_modified.encode('utf-8')).readline)))):
+                            return False
+                        
+                        elif not(list_blocks[i].string.lower() in dict_procedures.keys() and len(dict_procedures[list_blocks[i].string.lower()]) == len(string_modified.split(',')) and check_token_sequence_defProc(list(tokenize.tokenize(BytesIO(string_modified.encode('utf-8')).readline)))):
+                            return False
+                else:
 
-                    string_modified = line.replace(list_blocks[i].string,'').replace('(','').replace(')','').replace('\n','').replace(';','')
+                    if line[-1] == ';' and list_blocks[i+1].string == '(' and line.replace(';','')[-1] == ')':
+                        
+                        if not(list_blocks[i].string.lower() in dict_procedures.keys() and len(dict_procedures[list_blocks[i].string.lower()])== len(string_modified.split())):
+                            return False
+                        
+                    elif line[-1] == ')' and  list_blocks[i+1].string == '(':
 
-                    if not(list_blocks[i].string.lower() == defProc.lower() and len(string_modified.split()) == len(dict_procedures[defProc]) and check_token_sequence_defProc(list(tokenize.tokenize(BytesIO(string_modified.encode('utf-8')).readline)))):
-                        return False
-                    
-                    elif not(list_blocks.string in dict_procedures.keys() and len(dict_procedures[list_blocks.string]== string_modified.split()) and check_token_sequence_defProc(list(tokenize.tokenize(BytesIO(string_modified.encode('utf-8')).readline)))):
-                        return False
-                    
-                elif line[-1] == ')' and  list_blocks[i+1] == '(' and line.replace(';','')[-1] == ')':
+                        if not(list_blocks[i].string.lower() in dict_procedures.keys() and len(dict_procedures[list_blocks[i].string.lower()])== len(string_modified.split())):
+                            return False
 
-                    string_modified = line.replace(list_blocks[i].string,'').replace('(','').replace(')','').replace('\n','').replace(';','')
-
-                    if not(list_blocks[i].string.lower() == defProc.lower() and len(string_modified.split()) == len(dict_procedures[defProc]) and check_token_sequence_defProc(list(tokenize.tokenize(BytesIO(string_modified.encode('utf-8')).readline)))):
-                        return False
-                    
-                    elif not(list_blocks.string in dict_procedures.keys() and len(dict_procedures[list_blocks.string]== string_modified.split()) and check_token_sequence_defProc(list(tokenize.tokenize(BytesIO(string_modified.encode('utf-8')).readline)))):
-                        return False
     else:
         return False
 
@@ -208,7 +220,7 @@ def parse_definition_defProc(list_blocks,defProc):
 
 def parse_definition(tokens, index):
 
-    if tokens[index].string in ['defVar', 'defProc']:#Definimos el procedimiento para verificar las definiciones de las funciones y las variables 
+    if tokens[index].string.lower() in ['defvar', 'defproc']:#Definimos el procedimiento para verificar las definiciones de las funciones y las variables 
         #-------------------------------------------------------------------------------------------------------------------------------------------------------------
         #PARSER VARIABLE DEFINITION
         if tokens[index].string == 'defVar':#Definimos la sintaxis y semantica para las definicion de las variables
@@ -236,7 +248,7 @@ def parse_definition(tokens, index):
             if tokens[index+1].type == tokenize.NAME:
                 if tokens[index+2].string == "(" and tokens[index].line.strip()[-1] == ")":
 
-                    string_modified= tokens[index].line.lower().replace('defproc','').replace(tokens[index+1].string.lower(),'').replace('(','').replace(')','').replace(" ","")
+                    string_modified= tokens[index].line.strip().lower().replace('defproc','').replace(tokens[index+1].string.lower(),'').replace('(','').replace(')','').replace(" ","")
 
                     if len(string_modified)==0:
                         
@@ -293,7 +305,7 @@ tokens = tokenize_text_from_file("/home/keith/Downloads/LYM_PROY_0/sample_sample
 #    print("False")
 list_block=extract_code_blocks(tokens)
 print(parse_execution(tokens))
-#print(list_procedures)
+print(dict_variables)
 """
 parse_execution(tokens)
 print(list_procedures)

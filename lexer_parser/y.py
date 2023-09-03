@@ -1,4 +1,1 @@
-list_built_in_function=["jump","walk","leap","turn","turninto","drop","get","grab","letGo","nop"]
-
-if "drop" in list_built_in_function:
-    print(True)
+{'nom': '0', 'x': '0', 'y': '0', 'one': '0', 'letgo': '8'}

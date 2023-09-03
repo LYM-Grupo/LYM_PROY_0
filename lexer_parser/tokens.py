@@ -4,6 +4,10 @@
 import tokenize
 from io import BytesIO
 
+conditions=[{"key":"facing","args":1,"type_1": "orientation"},
+            {"key":"can","args":1,"type_1": "built_in_function"},
+            {"key":"not","args":1,"type_1": "condition"}]
+
 values_parameters={"orientation":["north","south","east","west"],"direction":["left","right","around"]}
 dict_variables={}
 dict_procedures={}
@@ -123,6 +127,30 @@ def check_token_sequence_defProc(tokens):
             return False
     return result
 
+def extract_while_blocks(tokens):
+    while_blocks = []
+    block = []
+    depth = 0
+    within_while = False
+
+    for token in tokens:
+        if token.string == 'while':
+            depth += 1
+            within_while = True
+            if depth == 1:
+                block = [token]
+        elif token.string == '}':
+            depth -= 1
+            if depth == 0 and within_while:
+                block.append(token)
+                while_blocks.append(block)
+                within_while = False
+        elif depth > 0 and within_while:
+            block.append(token)
+    
+    return while_blocks
+
+
 def check_token_sequence_defProc_brackets(tokens):
     result= False
     for i in range(0,len(tokens)-3):
@@ -155,6 +183,9 @@ def check_token_sequence_defProc_brackets(tokens):
         else:
             return False
     return result
+
+def parse_definition_control_structures():
+    pass
 
 def parse_definition_defProc(list_blocks,defProc):
     #Faltan hacer varias cosas porque las funciones tambien permiten recursion de las misma funcion y llamado de otras funcion dentro de la misma funcion 
@@ -249,7 +280,12 @@ def parse_definition_defProc(list_blocks,defProc):
 
                         if not(list_blocks[i].string.lower() in dict_procedures.keys() and len(dict_procedures[list_blocks[i].string.lower()])== len(string_modified.split())):
                             return False
+            
+            #elif list_blocks[i].string.lower() == "while":
+            #    pass
 
+            #elif list_blocks[i].string.lower() == "while":
+            #    pass     
     else:
         return False
 
@@ -341,7 +377,11 @@ tokens = tokenize_text_from_file("/home/keith/Downloads/LYM_PROY_0/sample_sample
 #except:
 #    print("False")
 list_block=extract_code_blocks(tokens)
-print(parse_execution(tokens))
+list_while_blocks = extract_while_blocks(tokens)
+#print(parse_execution(tokens))
+for i in list_while_blocks:
+    print(i)
+    print('\n')
 
 """
 parse_execution(tokens)

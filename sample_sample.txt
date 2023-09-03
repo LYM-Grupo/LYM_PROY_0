@@ -1,9 +1,10 @@
-defVar nom 0
-defVar x 0
-defVar y 0
-defVar one 0
-defVar letGo 8
-defProc putCB (a,b)
 {
-putCB(x,y)
+    drop (1) ;
+    letGo (2) ;
+    walk (1) ;
+    while can ( walk (1 , north )) {
+        walk (1 , north );
+        while can ( walk (1 , north )) { walk (1 , north )}
+    }
+    while can ( walk (1 , north )) { walk (1 , north ) };
 }

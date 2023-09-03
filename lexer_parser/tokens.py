@@ -295,8 +295,7 @@ tokens = tokenize_text_from_file("/home/keith/Downloads/LYM_PROY_0/sample_sample
 #    print("False")
 list_block=extract_code_blocks(tokens)
 parse_execution(tokens)
-print(dict_procedures)
-#print(parse_execution(tokens))
+print(parse_execution(tokens))
 #print(list_procedures)
 """
 parse_execution(tokens)

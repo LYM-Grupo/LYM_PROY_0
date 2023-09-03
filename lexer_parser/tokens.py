@@ -42,13 +42,10 @@ def verify_types(x,list_string_modified,defProc):
 
             if x[z]["type_1"] == "value" and not(list_string_modified[0] in dict_variables.keys() or list_string_modified[0] in dict_procedures[defProc]):
 
-                if x[z]["type_1"] == "value" and not(list_string_modified[0] in dict_variables.keys() or list_string_modified[0] in dict_procedures[defProc]):
+                if x[z]["type_2"] == "orientation" and not(list_string_modified[0].lower() in values_parameters["orientation"]):
                     return False
                 
-                elif x[z]["type_1"] == "orientation" and not(list_string_modified[0].lower() in values_parameters["orientation"]):
-                    return False
-                
-                elif x[z]["type_1"] == "direction" and not(list_string_modified[0].lower() in values_parameters["direction"]):
+                elif x[z]["type_2"] == "direction" and not(list_string_modified[0].lower() in values_parameters["direction"]):
                     return False
             
             elif x[z]["type_1"] == "orientation" and not(list_string_modified[0].lower() in values_parameters["orientation"]):
@@ -56,7 +53,6 @@ def verify_types(x,list_string_modified,defProc):
             
             elif x[z]["type_1"] == "direction" and not(list_string_modified[0].lower() in values_parameters["direction"]):
                 return False
-            
         else:
             return False
     return True
@@ -149,25 +145,23 @@ def parse_definition_defProc(list_blocks,list_built_in_function,defProc):
                             x=search_list_dict_built_in_function(list_blocks[i].string,list_dict_built_in_function,len(list_string_modified))
                             if len(x) !=0:#tenemos que verificar que el numero de  argumentos en la funcion sea el correcto
                              
-                                verify_types(x,list_string_modified,defProc)
-
-                                if len(list_string_modified)==0:
-                                    pass
-                                for j in list_string_modified:#lo indentamos si no funciona 
-
-                                    if (j not in dict_variables.keys() or j not in dict_procedures[defProc]):#esta busqueda esta mal
-                                        #es necesario hacer la verificacion de si es north direction y eso pero no es problema lo hago despues de bañarme 
-                                        return False
+                                if not verify_types(x,list_string_modified,defProc):
+                                    return False
                                     
                             else:
                                 return False
                         else:
                             return False
                     else:
-                        pass# aca toca hacer algo cuando no hay argumentos 
+                        if list_blocks[i].string != "nop":
+                            return False
                 else:
                     
                     return False
+                
+            elif list_blocks[i].string in dict_procedures.keys():
+                pass
+                
     else:
         return False
     return True

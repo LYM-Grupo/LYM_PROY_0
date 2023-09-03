@@ -169,7 +169,7 @@ def parse_definition_defProc(list_blocks,list_built_in_function,defProc):
                             x=search_list_dict_built_in_function(list_blocks[i].string,list_dict_built_in_function,len(list_string_modified))
                             if len(x) !=0:#tenemos que verificar que el numero de  argumentos en la funcion sea el correcto
                              
-                                if not verify_types(x,list_string_modified,defProc):
+                                if not verify_types(x,list_string_modified,defProc.lower()):
                                     return False
                                     
                             else:
@@ -218,11 +218,11 @@ def parse_definition(tokens, index):
             if tokens[index+1].type == tokenize.NAME:#la variable tiene que ser de tipo NAME no puede ser operador
 
                 if tokens[index+2].type == tokenize.NAME and tokens[index+2].string in dict_variables.keys():#search_list_dict(list_dict_variables,tokens[index+2].string):#Si es una variable que es NAME entonces tienes que estar definida anteriormente
-                    dict_variables[str(tokens[index+1].string)] = tokens[index+2].string
+                    dict_variables[str(tokens[index+1].string).lower()] = tokens[index+2].string
                     #list_dict_variables.append({str(tokens[index+1].string):tokens[index+2].string})
                     
                 elif tokens[index+2].type == tokenize.NUMBER:#Si es numero 
-                    dict_variables[str(tokens[index+1].string)] = tokens[index+2].string
+                    dict_variables[str(tokens[index+1].string).lower()] = tokens[index+2].string
                     #list_dict_variables.append({str(tokens[index+1].string):tokens[index+2].string})
                     
                 else:
@@ -233,21 +233,22 @@ def parse_definition(tokens, index):
                 return False
         #-------------------------------------------------------------------------------------------------------------------------------------------------------------
         #PARSER PROCEDURE DEFINITION
-        elif tokens[index].string == 'defProc':#Definimos la sintaxis y semantica para la defincion de las funciones
+        elif tokens[index].string.lower() == 'defproc':#Definimos la sintaxis y semantica para la defincion de las funciones
             
             if tokens[index+1].type == tokenize.NAME:
                 if tokens[index+2].string == "(" and tokens[index].line.strip()[-1] == ")":
 
-                    string_modified= tokens[index].line.replace('defProc','').replace(str(tokens[index+1].string),'').replace('(','').replace(')','').replace(" ","")
+                    string_modified= tokens[index].line.lower().replace('defproc','').replace(str(tokens[index+1].string),'').replace('(','').replace(')','').replace(" ","")
 
                     
                     if len(string_modified)==0:
-                        dict_procedures[tokens[index+1].string]=[]
+                        dict_procedures[tokens[index+1].string.lower()]=[]
                         #list_dict_procedures.append({tokens[index+1].string:[]})
                         
                         search_position_variable=search_position(list_block,(tokens[index].start[0]+1,0))
                         if search_position_variable[0]:#si tiene el mismo identificador que el del procedmiento asi sea sumandole 1 al start y end
-                            parse_definition_defProc(search_position_variable[1],list_dict_built_in_function,tokens[index+1].string)
+                            if not(parse_definition_defProc(search_position_variable[1],list_dict_built_in_function,tokens[index+1].string.lower())):
+                                return False
                             
                         else:
                             return False
@@ -257,12 +258,14 @@ def parse_definition(tokens, index):
 
                         if check_token_sequence_defProc(string_proc):
 
-                            dict_procedures[tokens[index+1].string] = string_modified.replace('\n','').split(',')
+                            dict_procedures[tokens[index+1].string.lower()] = string_modified.replace('\n','').split(',')
                             #list_dict_procedures.append({tokens[index+1].string:string_modified.replace('\n','').split(',')})
                                  
                             search_position_variable = search_position(list_block,(tokens[index].start[0]+1,0))
                             if search_position_variable[0]:
-                                parse_definition_defProc(search_position_variable[1],list_dict_built_in_function,tokens[index+1].string)
+                                if not(parse_definition_defProc(search_position_variable[1],list_dict_built_in_function,tokens[index+1].string.lower())):
+                                    return False
+                                       
                             else:
                                 return False
                         else:

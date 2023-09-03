@@ -1,3 +1,2 @@
 lista="b"
-if not("a" in lista):
-    print("Hello")
+print(lista.replace("b","y").replace(";",""))

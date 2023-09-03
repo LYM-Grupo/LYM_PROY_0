@@ -28,7 +28,7 @@ list_dict_built_in_function=[
 def verify_types(x,list_string_modified,defProc):        
     for z in range(0,len(x)):
         if x[z]["args"] == 1:
-
+            print(dict_procedures)#IMPORTANTE Esto es mal 
             if x[z]["type_1"] == "value" and not(list_string_modified[0] in dict_variables.keys() or list_string_modified[0] in dict_procedures[defProc]):
                 return False
             
@@ -140,20 +140,18 @@ def parse_definition_defProc(list_blocks,defProc):
                     if len(string_modified) !=0:
                         print(string_modified)
                         #IMPORTANTE : eliminar check_token_sequence_defProc
-                        if check_token_sequence_defProc(list(tokenize.tokenize(BytesIO(string_modified.encode('utf-8')).readline))):#quitar esto
 
-                            list_string_modified = string_modified.split(',') 
+                        list_string_modified = string_modified.split(',') 
                             
-                            x=search_list_dict_built_in_function(list_blocks[i].string,list_dict_built_in_function,len(list_string_modified))
-                            if len(x) !=0:#tenemos que verificar que el numero de  argumentos en la funcion sea el correcto
+                        x=search_list_dict_built_in_function(list_blocks[i].string,list_dict_built_in_function,len(list_string_modified))
+                        if len(x) !=0:#tenemos que verificar que el numero de  argumentos en la funcion sea el correcto
                              
-                                if not verify_types(x,list_string_modified,defProc):
-                                    return False
-                                    
-                            else:
+                            if not verify_types(x,list_string_modified,defProc):
                                 return False
+                                    
                         else:
                             return False
+
                     else:
                         if list_blocks[i].string != "nop":
                             return False

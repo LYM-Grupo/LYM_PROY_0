@@ -3,7 +3,7 @@ defVar x 0
 defVar y 0
 defVar one 0
 defVar letGo 8s
-defProc putCB (c,b)
+defProc putCB (a,b)
 {
 putCB(a,b)
 }

@@ -106,18 +106,41 @@ def search_position(list_block,target_coordinate):
 def check_token_sequence_defProc(tokens):
     result = False 
     for i in range(0,len(tokens)-3):
+        if tokens[0].type == tokenize.NAME:
+            #AQUI
+            if tokens[i].type == tokenize.NAME:
+                if tokens[i+1].type == tokenize.OP and tokens[i+1].string == ',':
+                    result = True
+                else:
+                    return False
+                
+            elif tokens[i].type == tokenize.OP and tokens[i].string == ',':
+                if tokens[i+1].type == tokenize.NAME:
+                    result = True
+                else:
+                    return False
+        else:
+            return False
+    return result
 
-        if tokens[i].type == tokenize.NAME:
-            if tokens[i+1].type == tokenize.OP and tokens[i+1].string == ',':
-                result = True
-            else:
-                return False
+def check_token_sequence_defProc_brackets(tokens):
+    result= False
+    for i in range(0,len(tokens)-3):
+        if tokens[0].type == tokenize.NAME or tokens[0].type == tokenize.NUMBER:
             
-        elif tokens[i].type == tokenize.OP and tokens[i].string == ',':
-            if tokens[i+1].type == tokenize.NAME:
-                result = True
-            else:
-                return False
+            if tokens[i].type == tokenize.NAME or tokens[i].type == tokenize.NUMBER:
+                if tokens[i+1].type == tokenize.OP and tokens[i+1].string == ',':
+                    result = True
+                else:
+                    return False
+                
+            elif tokens[i].type == tokenize.OP and tokens[i].string == ',':
+                if tokens[i+1].type == tokenize.NAME or tokens[i+1].type == tokenize.NUMBER:
+                    result = True
+                else:
+                    return False
+        else:
+            return False
     return result
 
 def parse_definition_defProc(list_blocks,defProc):
@@ -188,18 +211,19 @@ def parse_definition_defProc(list_blocks,defProc):
                 if len(string_modified)!=0:
                     if line[-1] == ';' and list_blocks[i+1].string == '(' and line.replace(';','')[-1] == ')':
                         
-                        if not(list_blocks[i].string.lower() == defProc.lower() and len(string_modified.split(',')) == len(dict_procedures[defProc]) and check_token_sequence_defProc(list(tokenize.tokenize(BytesIO(string_modified.encode('utf-8')).readline)))):
+                        if not(list_blocks[i].string.lower() == defProc.lower() and len(string_modified.split(',')) == len(dict_procedures[defProc]) and check_token_sequence_defProc_brackets(list(tokenize.tokenize(BytesIO(string_modified.encode('utf-8')).readline)))):
                             return False
                         
-                        elif not(list_blocks[i].string.lower() in dict_procedures.keys() and len(dict_procedures[list_blocks[i].string.lower()])== len(string_modified.split(',')) and check_token_sequence_defProc(list(tokenize.tokenize(BytesIO(string_modified.encode('utf-8')).readline)))):
+                        elif not(list_blocks[i].string.lower() in dict_procedures.keys() and len(dict_procedures[list_blocks[i].string.lower()])== len(string_modified.split(',')) and check_token_sequence_defProc_brackets(list(tokenize.tokenize(BytesIO(string_modified.encode('utf-8')).readline)))):
                             return False
-#Falta verificar si las variables estan definidas dentro del procedimiento o son variables globales                         
+#Falta verificar si las variables estan definidas dentro del procedimiento o son variables globales
+# IMPORTANTE HACER OTRA FUNCION                         
                     elif line[-1] == ')' and  list_blocks[i+1].string == '(':
                         
-                        if not(list_blocks[i].string.lower() == defProc.lower() and len(string_modified.split(',')) == len(dict_procedures[defProc]) and check_token_sequence_defProc(list(tokenize.tokenize(BytesIO(string_modified.encode('utf-8')).readline)))):
+                        if not(list_blocks[i].string.lower() == defProc.lower() and len(string_modified.split(',')) == len(dict_procedures[defProc]) and check_token_sequence_defProc_brackets(list(tokenize.tokenize(BytesIO(string_modified.encode('utf-8')).readline)))):
                             return False
                         
-                        elif not(list_blocks[i].string.lower() in dict_procedures.keys() and len(dict_procedures[list_blocks[i].string.lower()]) == len(string_modified.split(',')) and check_token_sequence_defProc(list(tokenize.tokenize(BytesIO(string_modified.encode('utf-8')).readline)))):
+                        elif not(list_blocks[i].string.lower() in dict_procedures.keys() and len(dict_procedures[list_blocks[i].string.lower()]) == len(string_modified.split(',')) and check_token_sequence_defProc_brackets(list(tokenize.tokenize(BytesIO(string_modified.encode('utf-8')).readline)))):
                             return False
                 else:
 

@@ -29,7 +29,7 @@ list_dict_built_in_function=[
     {"key":"nop","args":0,"type_1":"None"}
 ]
 
-def verify_types(x,list_string_modified,defProc):#Esto es mal toca corregirlo plus toca corregir lo del punto y coma 
+def verify_types(x,list_string_modified,defProc):#IMPORTANTE: Esto es mal toca corregirlo plus toca corregir lo del punto y coma 
     for z in range(0,len(x)):
         if x[z]["args"] == 1:
             #print(dict_procedures)#IMPORTANTE Esto es mal 

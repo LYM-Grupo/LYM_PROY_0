@@ -29,11 +29,11 @@ list_dict_built_in_function=[
     {"key":"nop","args":0,"type_1":"None"}
 ]
 
-def verify_types(x,list_string_modified,defProc):        
+def verify_types(x,list_string_modified,defProc):#Esto es mal toca corregirlo plus toca corregir lo del punto y coma 
     for z in range(0,len(x)):
         if x[z]["args"] == 1:
             #print(dict_procedures)#IMPORTANTE Esto es mal 
-            if x[z]["type_1"] == "value" and not(list_string_modified[0] in dict_variables.keys() or list_string_modified[0] in dict_procedures[defProc]):
+            if x[z]["type_1"] == "value" and (list_string_modified[0] in dict_variables.keys() or list_string_modified[0] in dict_procedures[defProc] or list_string_modified[0].isdigit()):
                 return False
             
             elif x[z]["type_1"] == "orientation" and not(list_string_modified[0].lower() in values_parameters["orientation"]):
@@ -41,22 +41,29 @@ def verify_types(x,list_string_modified,defProc):
             
             elif x[z]["type_1"] == "direction" and not(list_string_modified[0].lower() in values_parameters["direction"]):
                 return False
-
+        
         elif x[z]["args"] == 2:
+            print(x[z]["type_2"] == "direction")
+            print(list_string_modified[1].lower() in values_parameters["direction"])
+            print('\n')
+            print(x[z]["type_2"] == "orientation")
+            print(list_string_modified[1].lower() in values_parameters["orientation"])
+            print('\n')
 
-            if x[z]["type_1"] == "value" and not(list_string_modified[0] in dict_variables.keys() or list_string_modified[0] in dict_procedures[defProc]):
+            if x[z]["type_1"] == "value" and (list_string_modified[0] in dict_variables.keys() or list_string_modified[0] in dict_procedures[defProc] or list_string_modified[0].isdigit()):
 
-                if x[z]["type_2"] == "orientation" and not(list_string_modified[0].lower() in values_parameters["orientation"]):
+                if x[z]["type_2"] == "orientation" and not(list_string_modified[1].lower() in values_parameters["orientation"]):
                     return False
                 
-                elif x[z]["type_2"] == "direction" and not(list_string_modified[0].lower() in values_parameters["direction"]):
+                elif x[z]["type_2"] == "direction" and not(list_string_modified[1].lower() in values_parameters["direction"]):
                     return False
-            
+                
             elif x[z]["type_1"] == "orientation" and not(list_string_modified[0].lower() in values_parameters["orientation"]):
                 return False
             
             elif x[z]["type_1"] == "direction" and not(list_string_modified[0].lower() in values_parameters["direction"]):
                 return False
+
         else:
             return False
     return True
@@ -191,9 +198,11 @@ def parse_definition_defProc(list_blocks,defProc):
     #Faltan hacer varias cosas porque las funciones tambien permiten recursion de las misma funcion y llamado de otras funcion dentro de la misma funcion 
     #Falta otra cosa que es la verificacion del orden de los argumentos de una built-in function
     list_blocks=list_blocks[1:-1]
+    length = len(list_blocks)
     if list_blocks[-1].string == ')':
-
-        for i in range(0,len(list_blocks)):
+        i=0
+        while i<length:# IMPORTANTE: Necesitamos elminar bloques de codigo de while aumentando el numero de lineas de acuerdo a la cantidad de tokens presentes en el bloque 
+        #for i in range(0,len(list_blocks)):
             
             if list_blocks[i].string.lower() in list_built_in_function:
             
@@ -223,7 +232,7 @@ def parse_definition_defProc(list_blocks,defProc):
                         if list_blocks[i].string.lower() != "nop":
                             return False
                         
-                elif line[-1] == ')' and list_blocks[i+1].string == '(' and line.replace(';','')[-1] == ')':
+                elif line[-1] == ')' and list_blocks[i+1].string == '(':#Aca esta el error de las comillas
 
                     string_modified = line.strip().replace(list_blocks[i].string.lower(),'').replace('(','').replace(')','').replace('\n','').replace(';','')
 
@@ -260,8 +269,7 @@ def parse_definition_defProc(list_blocks,defProc):
                         
                         elif not(list_blocks[i].string.lower() in dict_procedures.keys() and len(dict_procedures[list_blocks[i].string.lower()])== len(string_modified.split(',')) and check_token_sequence_defProc_brackets(list(tokenize.tokenize(BytesIO(string_modified.encode('utf-8')).readline)))):
                             return False
-#Falta verificar si las variables estan definidas dentro del procedimiento o son variables globales
-# IMPORTANTE HACER OTRA FUNCION                         
+                      
                     elif line[-1] == ')' and  list_blocks[i+1].string == '(':
                         
                         if not(list_blocks[i].string.lower() == defProc.lower() and len(string_modified.split(',')) == len(dict_procedures[defProc]) and check_token_sequence_defProc_brackets(list(tokenize.tokenize(BytesIO(string_modified.encode('utf-8')).readline)))):
@@ -280,12 +288,7 @@ def parse_definition_defProc(list_blocks,defProc):
 
                         if not(list_blocks[i].string.lower() in dict_procedures.keys() and len(dict_procedures[list_blocks[i].string.lower()])== len(string_modified.split())):
                             return False
-            
-            #elif list_blocks[i].string.lower() == "while":
-            #    pass
-
-            #elif list_blocks[i].string.lower() == "while":
-            #    pass     
+            i+=1   
     else:
         return False
 
@@ -377,11 +380,9 @@ tokens = tokenize_text_from_file("/home/keith/Downloads/LYM_PROY_0/sample_sample
 #except:
 #    print("False")
 list_block=extract_code_blocks(tokens)
-list_while_blocks = extract_while_blocks(tokens)
-#print(parse_execution(tokens))
-for i in list_while_blocks:
-    print(i)
-    print('\n')
+#list_while_blocks = extract_while_blocks(tokens)
+print(parse_execution(tokens))
+
 
 """
 parse_execution(tokens)

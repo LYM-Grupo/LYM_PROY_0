@@ -1,10 +1,5 @@
-{
-    drop (1) ;
-    letGo (2) ;
-    walk (1) ;
-    while can ( walk (1 , north )) {
-        walk (1 , north );
-        while can ( walk (1 , north )) { walk (1 , north )}
-    }
-    while can ( walk (1 , north )) { walk (1 , north ) };
+defProc putCB (c , b)
+{   
+    walk (1, north)
+
 }

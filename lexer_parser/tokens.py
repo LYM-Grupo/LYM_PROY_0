@@ -13,12 +13,11 @@ dict_variables={}
 dict_procedures={}
 list_built_in_function=["jump","walk","leap","turn","turninto","drop","get","grab","letGo","nop"]
 list_dict_built_in_function=[   
-    {"key":"jump","args":2,"type_1":"value"},
     {"key":"walk","args":1,"type_1":"value"},
     {"key":"walk","args":2,"type_1":"value","type_2":"direction"},
     {"key":"walk","args":2,"type_1":"value","type_2":"orientation"},
     {"key":"leap","args":1,"type_1":"value"},
-    {"key":"leap","args":2,"type_1":"value","type_2":"direction"},
+    {"key":"leap","args":2,"type_1":"value","type_2":"orientation"},
     {"key":"leap","args":2,"type_1":"value","type_2":"direction"},
     {"key":"turn","args":1,"type_1":"direction"},
     {"key":"turnto","args":1,"type_1":"orientation"},
@@ -26,7 +25,8 @@ list_dict_built_in_function=[
     {"key":"get","args":1,"type_1":"value"},
     {"key":"grab","args":2,"type_1":"value"},
     {"key":"letGo","args":1,"type_1":"value"},
-    {"key":"nop","args":0,"type_1":"None"}
+    {"key":"nop","args":0,"type_1":"None"},
+    {"key":"jump","args":2,"type_1":"value","type_2":"value"}
 ]
 
 def verify_types(x,list_string_modified,defProc):#IMPORTANTE: Esto es mal toca corregirlo plus toca corregir lo del punto y coma 
@@ -44,21 +44,17 @@ def verify_types(x,list_string_modified,defProc):#IMPORTANTE: Esto es mal toca c
                 result = True
         
         elif x[z]["args"] == 2:
-
+            
             if x[z]["type_1"] == "value" and (list_string_modified[0] in dict_variables.keys() or list_string_modified[0] in dict_procedures[defProc] or list_string_modified[0].isdigit()):
-
+                
                 if x[z]["type_2"] == "orientation" and (list_string_modified[1].lower() in values_parameters["orientation"]):
                     result = True
                 
                 elif x[z]["type_2"] == "direction" and (list_string_modified[1].lower() in values_parameters["direction"]):
                     result = True
-                
-            elif x[z]["type_1"] == "orientation" and (list_string_modified[0].lower() in values_parameters["orientation"]):
-                result = True
-            
-            elif x[z]["type_1"] == "direction" and (list_string_modified[0].lower() in values_parameters["direction"]):
-                result = True
 
+                elif x[z]["type_2"] == "value" and (list_string_modified[1] in dict_variables.keys() or list_string_modified[1] in dict_procedures[defProc] or list_string_modified[1].isdigit()):
+                    result = True
         else:
             return False
     return result
@@ -187,39 +183,64 @@ def check_token_sequence_defProc_brackets(tokens):
     return result
 
 def parse_while_control_structure(list_blocks,string):
-    result= False
+    result= False,len(list_blocks)
     i=0
-    length = len(list_blocks) 
+    
+    length = len(list_blocks)-1 
     while i< length:
+
         if list_blocks[i].line.strip()[-1] == '}' or list_blocks[i].line.strip()[-1] == ';':
 
             if list_blocks[i+1].string.lower() == "facing" and list_blocks[i+2].string.lower() =='(' and list_blocks[i+3].string.lower() in values_parameters["orientation"] and list_blocks[i+4].string.lower() == ')':
 
-                pass
+                    pass
 
             elif list_blocks[i+1].string.lower() == "can" and list_blocks[i+2].string.lower() == '(':
                 while_index = list_blocks[i].line.find('while')
                 #first_key_index =list_blocks[i].line.find('{',while_index)
 
                 string_modified= list_blocks[i].line[while_index+5:list_blocks[i].line.find('{',while_index)].replace('can','').strip()
+                
                 if string_modified[-1] == ')':
                     string_modified = string_modified[1:-1].replace(' ','')
                     list_tokens=list(tokenize.tokenize(BytesIO(string_modified.encode('utf-8')).readline))[1:-1]
                     
-                    string_modified = string_modified.replace(list_tokens[0].string.lower(),'').strip()[1:-1].split(',')
-                    x = search_list_dict_built_in_function(list_tokens[0].string.lower(),list_dict_built_in_function,len(string_modified))
-                    
-                    if len(x)!=0:
-                        pass
+                    string_modified = string_modified.replace(list_tokens[0].string.lower(),'').strip()[1:-1]
+
+                    if len(string_modified)!=0:
+                        list_string_modified =string_modified.split(',')
+                        x = search_list_dict_built_in_function(list_tokens[0].string.lower(),list_dict_built_in_function,len(list_string_modified))
+                        
+                        if len(x)!=0:
+                            
+                            if verify_types(x,list_string_modified,string):
+
+                                string_modified_2=list_blocks[i].line[list_blocks[i].line.find('{')+1:list_blocks[i].line.find('}')].replace(' ','')
+                                list_tokens_2=list(tokenize.tokenize(BytesIO(string_modified_2.encode('utf-8')).readline))[1:-1]
+                                string_modified_2= string_modified_2.replace(list_tokens_2[0].string.lower(),'').strip()[1:-1]
+                                
+                                if len(string_modified_2) !=0:
+                                    list_string_modified_2 = string_modified_2.split(',')
+                                    y = search_list_dict_built_in_function(list_tokens_2[0].string.lower(),list_dict_built_in_function,len(list_string_modified_2))
+                                    if len(y)!=0:
+                                        
+                                        if verify_types(y,list_string_modified_2,string):
+                                            result = True ,len(list_blocks)
+                                        else:
+                                            return False ,len(list_blocks)
+                            else:
+                                return False,len(list_blocks)
+                            
+                        else:
+                            return False,len(list_blocks)
                     else:
-                        return False
+                        if list_tokens[0].lower() != "nop":
+                            return False ,len(list_blocks)
 
                 #search_list_dict_built_in_function()
             elif list_blocks[i+1].string.lower() == "not":
                 pass
 
-            else:
-                return False
             
         elif list_blocks[i].line.strip()[-1] == '{':
             pass
@@ -267,7 +288,7 @@ def parse_definition_defProc(list_blocks,defProc):
                         if list_blocks[i].string.lower() != "nop":
                             return False
                         
-                elif line[-1] == ')' and list_blocks[i+1].string == '(' and line==list_blocks[-1].line.replace(' ','').strip():#:#Aca esta el error de las comillas
+                elif line[-1] == ')' and list_blocks[i+1].string == '(' and line==list_blocks[-1].line.replace(' ','').strip().lower():#:#Aca esta el error de las comillas
 
                     string_modified = line.strip().replace(list_blocks[i].string.lower(),'').replace('(','').replace(')','').replace('\n','').replace(';','')
 
@@ -306,7 +327,7 @@ def parse_definition_defProc(list_blocks,defProc):
                         elif not(list_blocks[i].string.lower() in dict_procedures.keys() and len(dict_procedures[list_blocks[i].string.lower()])== len(string_modified.split(',')) and check_token_sequence_defProc_brackets(list(tokenize.tokenize(BytesIO(string_modified.encode('utf-8')).readline)))):
                             return False
                       
-                    elif line[-1] == ')' and  list_blocks[i+1].string == '('  and line==list_blocks[-1].line.replace(' ','').strip():
+                    elif line[-1] == ')' and  list_blocks[i+1].string == '('  and line==list_blocks[-1].line.replace(' ','').strip().lower():
                         
                         if not(list_blocks[i].string.lower() == defProc.lower() and len(string_modified.split(',')) == len(dict_procedures[defProc]) and check_token_sequence_defProc_brackets(list(tokenize.tokenize(BytesIO(string_modified.encode('utf-8')).readline)))):
                             return False
@@ -322,7 +343,7 @@ def parse_definition_defProc(list_blocks,defProc):
                         if not(list_blocks[i].string.lower() in dict_procedures.keys() and len(dict_procedures[list_blocks[i].string.lower()])== len(string_modified.split())):
                             return False
                         
-                    elif line[-1] == ')' and  list_blocks[i+1].string == '(' and line==list_blocks[-1].line.replace(' ','').strip():
+                    elif line[-1] == ')' and  list_blocks[i+1].string == '(' and line==list_blocks[-1].line.replace(' ','').strip().lower():
 
                         if not(list_blocks[i].string.lower() in dict_procedures.keys() and len(dict_procedures[list_blocks[i].string.lower()])== len(string_modified.split())):
                             return False
@@ -333,7 +354,10 @@ def parse_definition_defProc(list_blocks,defProc):
                 
                 search_position_variable = search_position(list_while_blocks,(list_blocks[i].start[0],list_blocks[i].start[1]))
                 if search_position_variable[0]:
-                    if not(parse_while_control_structure(search_position_variable[1],defProc.lower())):
+                    function=parse_while_control_structure(search_position_variable[1],defProc.lower())
+                    if function[0]:
+                        i+=function[1]
+                    else:
                         return False
 
             elif list_blocks[i].string.lower() == "if":

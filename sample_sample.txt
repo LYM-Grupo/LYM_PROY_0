@@ -1,5 +1,4 @@
-defProc putCB (c , b)
-{   
-    while can ( walk (1 , north )) { walk (1 , north ) }
-
+defProc putCB (c , b )
+{
+while can(walk(1 , north ) ) { walk(1 , north ) }
 }

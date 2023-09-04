@@ -195,6 +195,7 @@ def parse_definition_defProc(list_blocks,defProc):
     list_blocks=list_blocks[1:-1]
     length = len(list_blocks)
     if list_blocks[-1].string == ')':
+        
         i=0
         while i<length:# IMPORTANTE: Necesitamos elminar bloques de codigo de while aumentando el numero de lineas de acuerdo a la cantidad de tokens presentes en el bloque 
         #for i in range(0,len(list_blocks)):
@@ -227,7 +228,7 @@ def parse_definition_defProc(list_blocks,defProc):
                         if list_blocks[i].string.lower() != "nop":
                             return False
                         
-                elif line[-1] == ')' and list_blocks[i+1].string == '(':#Aca esta el error de las comillas
+                elif line[-1] == ')' and list_blocks[i+1].string == '(' and line==list_blocks[-1].line.replace(' ','').strip():#:#Aca esta el error de las comillas
 
                     string_modified = line.strip().replace(list_blocks[i].string.lower(),'').replace('(','').replace(')','').replace('\n','').replace(';','')
 
@@ -248,7 +249,8 @@ def parse_definition_defProc(list_blocks,defProc):
                     else:
                         if list_blocks[i].string.lower() != "nop":
                             return False
-                
+                else:
+                    return False
             elif list_blocks[i].string.lower() in dict_procedures.keys():
 
                 line=list_blocks[i].line.replace(' ','').strip().lower()
@@ -265,13 +267,15 @@ def parse_definition_defProc(list_blocks,defProc):
                         elif not(list_blocks[i].string.lower() in dict_procedures.keys() and len(dict_procedures[list_blocks[i].string.lower()])== len(string_modified.split(',')) and check_token_sequence_defProc_brackets(list(tokenize.tokenize(BytesIO(string_modified.encode('utf-8')).readline)))):
                             return False
                       
-                    elif line[-1] == ')' and  list_blocks[i+1].string == '(':
+                    elif line[-1] == ')' and  list_blocks[i+1].string == '('  and line==list_blocks[-1].line.replace(' ','').strip():
                         
                         if not(list_blocks[i].string.lower() == defProc.lower() and len(string_modified.split(',')) == len(dict_procedures[defProc]) and check_token_sequence_defProc_brackets(list(tokenize.tokenize(BytesIO(string_modified.encode('utf-8')).readline)))):
                             return False
                         
                         elif not(list_blocks[i].string.lower() in dict_procedures.keys() and len(dict_procedures[list_blocks[i].string.lower()]) == len(string_modified.split(',')) and check_token_sequence_defProc_brackets(list(tokenize.tokenize(BytesIO(string_modified.encode('utf-8')).readline)))):
                             return False
+                    else:
+                        return False
                 else:
 
                     if line[-1] == ';' and list_blocks[i+1].string == '(' and line.replace(';','')[-1] == ')':
@@ -279,10 +283,12 @@ def parse_definition_defProc(list_blocks,defProc):
                         if not(list_blocks[i].string.lower() in dict_procedures.keys() and len(dict_procedures[list_blocks[i].string.lower()])== len(string_modified.split())):
                             return False
                         
-                    elif line[-1] == ')' and  list_blocks[i+1].string == '(':
+                    elif line[-1] == ')' and  list_blocks[i+1].string == '(' and line==list_blocks[-1].line.replace(' ','').strip():
 
                         if not(list_blocks[i].string.lower() in dict_procedures.keys() and len(dict_procedures[list_blocks[i].string.lower()])== len(string_modified.split())):
                             return False
+                    else:
+                        return False
             i+=1   
     else:
         return False

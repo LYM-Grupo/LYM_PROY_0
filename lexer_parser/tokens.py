@@ -30,43 +30,38 @@ list_dict_built_in_function=[
 ]
 
 def verify_types(x,list_string_modified,defProc):#IMPORTANTE: Esto es mal toca corregirlo plus toca corregir lo del punto y coma 
+    result=False
     for z in range(0,len(x)):
         if x[z]["args"] == 1:
             #print(dict_procedures)#IMPORTANTE Esto es mal 
             if x[z]["type_1"] == "value" and (list_string_modified[0] in dict_variables.keys() or list_string_modified[0] in dict_procedures[defProc] or list_string_modified[0].isdigit()):
-                return False
+                result = True
             
-            elif x[z]["type_1"] == "orientation" and not(list_string_modified[0].lower() in values_parameters["orientation"]):
-                return False
+            elif x[z]["type_1"] == "orientation" and list_string_modified[0].lower() in values_parameters["orientation"]:
+                result = True
             
-            elif x[z]["type_1"] == "direction" and not(list_string_modified[0].lower() in values_parameters["direction"]):
-                return False
+            elif x[z]["type_1"] == "direction" and (list_string_modified[0].lower() in values_parameters["direction"]):
+                result = True
         
         elif x[z]["args"] == 2:
-            print(x[z]["type_2"] == "direction")
-            print(list_string_modified[1].lower() in values_parameters["direction"])
-            print('\n')
-            print(x[z]["type_2"] == "orientation")
-            print(list_string_modified[1].lower() in values_parameters["orientation"])
-            print('\n')
 
             if x[z]["type_1"] == "value" and (list_string_modified[0] in dict_variables.keys() or list_string_modified[0] in dict_procedures[defProc] or list_string_modified[0].isdigit()):
 
-                if x[z]["type_2"] == "orientation" and not(list_string_modified[1].lower() in values_parameters["orientation"]):
-                    return False
+                if x[z]["type_2"] == "orientation" and (list_string_modified[1].lower() in values_parameters["orientation"]):
+                    result = True
                 
-                elif x[z]["type_2"] == "direction" and not(list_string_modified[1].lower() in values_parameters["direction"]):
-                    return False
+                elif x[z]["type_2"] == "direction" and (list_string_modified[1].lower() in values_parameters["direction"]):
+                    result = True
                 
-            elif x[z]["type_1"] == "orientation" and not(list_string_modified[0].lower() in values_parameters["orientation"]):
-                return False
+            elif x[z]["type_1"] == "orientation" and (list_string_modified[0].lower() in values_parameters["orientation"]):
+                result = True
             
-            elif x[z]["type_1"] == "direction" and not(list_string_modified[0].lower() in values_parameters["direction"]):
-                return False
+            elif x[z]["type_1"] == "direction" and (list_string_modified[0].lower() in values_parameters["direction"]):
+                result = True
 
         else:
             return False
-    return True
+    return result
 
 def search_list_dict_built_in_function(key,list_dict,len_arguments):
     list_posibilities=[] 
@@ -374,7 +369,7 @@ def parse_execution(tokens):
         
 # mac : /Users/fodepixofarfan/Downloads/LYM_PROY_0/sample_program.txts
 # linux : /home/keith/Downloads/LYM_PROY_0/sample_program.txt
-tokens = tokenize_text_from_file("/home/keith/Downloads/LYM_PROY_0/sample_sample.txt")
+tokens = tokenize_text_from_file("/Users/fodepixofarfan/Downloads/LYM_PROY_0/sample_sample.txt")
 #try:
 #    print(parse_execution(tokens))
 #except:

@@ -1,5 +1,6 @@
 defProc putCB (c , b)
 {   
+    walk (west, west)
     walk (1, north)
 
 }

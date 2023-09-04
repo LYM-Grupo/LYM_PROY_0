@@ -186,15 +186,54 @@ def check_token_sequence_defProc_brackets(tokens):
             return False
     return result
 
-def parse_definition_control_structures():
-    pass
+def parse_while_control_structure(list_blocks,string):
+    result= False
+    i=0
+    length = len(list_blocks) 
+    while i< length:
+        if list_blocks[i].line.strip()[-1] == '}' or list_blocks[i].line.strip()[-1] == ';':
+
+            if list_blocks[i+1].string.lower() == "facing" and list_blocks[i+2].string.lower() =='(' and list_blocks[i+3].string.lower() in values_parameters["orientation"] and list_blocks[i+4].string.lower() == ')':
+
+                pass
+
+            elif list_blocks[i+1].string.lower() == "can" and list_blocks[i+2].string.lower() == '(':
+                while_index = list_blocks[i].line.find('while')
+                #first_key_index =list_blocks[i].line.find('{',while_index)
+
+                string_modified= list_blocks[i].line[while_index+5:list_blocks[i].line.find('{',while_index)].replace('can','').strip()
+                if string_modified[-1] == ')':
+                    string_modified = string_modified[1:-1].replace(' ','')
+                    list_tokens=list(tokenize.tokenize(BytesIO(string_modified.encode('utf-8')).readline))[1:-1]
+                    
+                    string_modified = string_modified.replace(list_tokens[0].string.lower(),'').strip()[1:-1].split(',')
+                    x = search_list_dict_built_in_function(list_tokens[0].string.lower(),list_dict_built_in_function,len(string_modified))
+                    
+                    if len(x)!=0:
+                        pass
+                    else:
+                        return False
+
+                #search_list_dict_built_in_function()
+            elif list_blocks[i+1].string.lower() == "not":
+                pass
+
+            else:
+                return False
+            
+        elif list_blocks[i].line.strip()[-1] == '{':
+            pass
+        i+=1
+    return result
+def parse_if_control_structure(list_blocks):
+    pass 
 
 def parse_definition_defProc(list_blocks,defProc):
     #Faltan hacer varias cosas porque las funciones tambien permiten recursion de las misma funcion y llamado de otras funcion dentro de la misma funcion 
     #Falta otra cosa que es la verificacion del orden de los argumentos de una built-in function
     list_blocks=list_blocks[1:-1]
     length = len(list_blocks)
-    if list_blocks[-1].string == ')':
+    if list_blocks[-1].string == ')' or list_blocks[-1].string == '}':
         
         i=0
         while i<length:# IMPORTANTE: Necesitamos elminar bloques de codigo de while aumentando el numero de lineas de acuerdo a la cantidad de tokens presentes en el bloque 
@@ -289,6 +328,18 @@ def parse_definition_defProc(list_blocks,defProc):
                             return False
                     else:
                         return False
+                    
+            elif list_blocks[i].string.lower() == "while":
+                
+                search_position_variable = search_position(list_while_blocks,(list_blocks[i].start[0],list_blocks[i].start[1]))
+                if search_position_variable[0]:
+                    if not(parse_while_control_structure(search_position_variable[1],defProc.lower())):
+                        return False
+
+            elif list_blocks[i].string.lower() == "if":
+                pass
+            elif list_blocks[i].string.lower() == "repeat":
+                pass
             i+=1   
     else:
         return False
@@ -375,13 +426,14 @@ def parse_execution(tokens):
         
 # mac : /Users/fodepixofarfan/Downloads/LYM_PROY_0/sample_program.txts
 # linux : /home/keith/Downloads/LYM_PROY_0/sample_program.txt
-tokens = tokenize_text_from_file("/Users/fodepixofarfan/Downloads/LYM_PROY_0/sample_sample.txt")
+tokens = tokenize_text_from_file("/home/keith/Downloads/LYM_PROY_0/sample_sample.txt")
 #try:
 #    print(parse_execution(tokens))
 #except:
 #    print("False")
 list_block=extract_code_blocks(tokens)
-#list_while_blocks = extract_while_blocks(tokens)
+list_while_blocks = extract_while_blocks(tokens)
+#print(list_while_blocks)
 print(parse_execution(tokens))
 
 

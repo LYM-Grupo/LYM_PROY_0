@@ -1,4 +1,5 @@
 defProc putCB (c , b )
 {
-repeat 5 times {}
+letGo ( b ) ;
+walk( 1 )
 }

@@ -25,7 +25,7 @@ list_dict_built_in_function=[
     {"key":"get","args":1,"type_1":"value"},
     {"key":"grab","args":2,"type_1":"value"},
     {"key":"letGo","args":1,"type_1":"value"},
-    {"key":"nop","args":0,"type_1":"None"},
+    {"key":"nop","args":0,"type_1":"none"},
     {"key":"jump","args":2,"type_1":"value","type_2":"value"}
 ]
 
@@ -42,9 +42,10 @@ def verify_types(x,list_string_modified,defProc):#IMPORTANTE: Esto es mal toca c
             
             elif x[z]["type_1"] == "direction" and (list_string_modified[0].lower() in values_parameters["direction"]):
                 result = True
+
         
         elif x[z]["args"] == 2:
-            
+
             if x[z]["type_1"] == "value" and (list_string_modified[0].lower() in dict_variables.keys() or list_string_modified[0].lower() in dict_procedures[defProc] or list_string_modified[0].isdigit()):
                 
                 if x[z]["type_2"] == "orientation" and (list_string_modified[1].lower() in values_parameters["orientation"]):
@@ -55,9 +56,8 @@ def verify_types(x,list_string_modified,defProc):#IMPORTANTE: Esto es mal toca c
 
                 elif x[z]["type_2"] == "value" and (list_string_modified[1].lower() in dict_variables.keys() or list_string_modified[1].lower() in dict_procedures[defProc] or list_string_modified[1].isdigit()):
                     result = True
-
-        elif x[z]["args"] == 0 and x[z]["type_1"]:
-            if list_string_modified[0]=='':
+        elif  x[z]["args"] == 0 and x[z]["type_1"]=='none':
+                
                 result = True
         else:
             return False
@@ -249,7 +249,8 @@ def parse_while_control_structure(list_blocks,string,last_line):
                                 
                             else:
                                 return False,len(list_blocks)
-           
+                else:
+                    return False
             elif list_blocks[i+1].string.lower() == "can" and list_blocks[i+2].string.lower() == '(':
                 while_index = list_blocks[i].line.find('while')
                 string_modified = list_blocks[i].line[while_index+5:list_blocks[i].line.find('{',while_index)].replace('can','').strip()
@@ -301,12 +302,14 @@ def parse_while_control_structure(list_blocks,string,last_line):
                             return True ,len(list_blocks)
                         else:
                             return False ,len(list_blocks)
+            else:
+                return False . len(list_blocks)
 
         elif list_blocks[i].line.strip()[-1] == '{':
             pass
         i+=1
     return result
-def parse_if_control_structure(list_blocks):
+def parse_if_control_structure(line,defProc):
     pass
 
 def parse_definition_defProc(list_blocks,defProc):
@@ -413,11 +416,11 @@ def parse_definition_defProc(list_blocks,defProc):
                         return False
 
             elif list_blocks[i].string.lower() == "if":
-
+                number_of_tokens=list(tokenize.tokenize(BytesIO(list_blocks[i].line.lower().replace(' ','').strip().encode('utf-8')).readline))[1:-1]
                 index_if = list_blocks[i].line.lower().find('if')
                 index_key = list_blocks[i].line.lower().find('{',index_if)
 
-                string_block_code=list_blocks[i].line.lower()[index_if+2:index_key].replace(' ','')
+                string_block_code=list_blocks[i].line.lower()[index_if+2:index_key].replace(' ','').strip()
 
                 if list_blocks[i+1].string == 'can':
                     string_modified=string_block_code.replace('can','')[1:-1]
@@ -432,15 +435,47 @@ def parse_definition_defProc(list_blocks,defProc):
                             first_index=list_blocks[i].line.lower().find('{')
                             second_index=list_blocks[i].line.lower().find('}')
                             
-                            first_block_code=list_blocks[i].line.lower()[first_index+1:second_index].strip()
+                            first_block_code=list_blocks[i].line.lower()[first_index+1:second_index].replace(' ','').strip()
+
+                            list_tokens_2=list(tokenize.tokenize(BytesIO(first_block_code.encode('utf-8')).readline))[1:-1]
+                            list_string_modified_2= first_block_code.replace(list_tokens_2[0].string.lower(),'')[1:-1].split(',')
+                            y=search_list_dict_built_in_function(list_tokens_2[0].string,list_dict_built_in_function,len(list_string_modified_2))
                             
-                            list_tokens=list(tokenize.tokenize(BytesIO(string_modified.encode('utf-8')).readline))[1:-1]
-                            list_string_modified= string_modified.replace(list_tokens[0].string.lower(),'')[1:-1].split(',')
-                            x=search_list_dict_built_in_function(list_tokens[0].string,list_dict_built_in_function,len(list_string_modified))
+                            if len(y) !=0:
+                                
+                                if verify_types(y,list_string_modified_2,defProc):
+                                    
+                                    string_else_block=list_blocks[i].line[list_blocks[i].line.find("else")+4:].replace(' ','').strip()
+                                
+                                    if string_else_block[-1] == '}'and string_else_block[0] == '{':
+                                        
+                                        string_else_block=string_else_block[1:-1]
+                                        
+                                        list_tokens_3=list(tokenize.tokenize(BytesIO(string_else_block.encode('utf-8')).readline))[1:-1]
+                                        list_string_modified_3 = string_else_block.replace(list_tokens_3[0].string.lower(),'')[1:-1].split(',')
+                                        if list_string_modified_3[0]=='' and list_tokens_3[0].string== 'nop':#Aqui esta lo del nop IMPORTANTE 
+                                            z=[{"key":"nop","args":0,"type_1":"none"}]
+                                        else:
+                                            z=search_list_dict_built_in_function(list_tokens_3[0].string,list_dict_built_in_function,len(list_string_modified_3))
+                                        
+                                        if len(z) !=0:
+                                            
+                                            if verify_types(z,list_string_modified_3,defProc):
+                                                i+=len(number_of_tokens)-1
+                                            else:
+                                                return False
+                                        else:
+                                            return False
+                                    else:
+                                        return False 
+                            else:
+                                return False
                     else:
-                        return False      
+                        return False
+                #elif list_blocks[i+1].string == 'facing':
+                #    string_modified=string_block_code.replace('facing','')[1:-1]
                     
-                    
+                                      
 
             elif list_blocks[i].string.lower() == "repeat":
                 pass

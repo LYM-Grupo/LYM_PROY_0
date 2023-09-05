@@ -340,18 +340,20 @@ def parse_while_control_structure(list_blocks,string,last_line):
                         else:
                             return False ,len(list_blocks)
             else:
-                return False . len(list_blocks)
+                return False , len(list_blocks)
 
         elif list_blocks[i].line.strip()[-1] == '{':
             pass
         i+=1
     return result
-def code_blocks():
-    pass
+def code_blocks(list_blocks):
+    print(list_blocks)
 def parse_definition_defProc(list_blocks,defProc):
     #Faltan hacer varias cosas porque las funciones tambien permiten recursion de las misma funcion y llamado de otras funcion dentro de la misma funcion 
     #Falta otra cosa que es la verificacion del orden de los argumentos de una built-in function
-    list_blocks=list_blocks[1:-1]
+    if list_blocks[-1].string == '}' and list_blocks[0]=='{':
+        list_blocks=list_blocks[1:-1]
+    
     length = len(list_blocks)
     if list_blocks[-1].string == ')' or list_blocks[-1].string == '}':
         
@@ -447,7 +449,7 @@ def parse_definition_defProc(list_blocks,defProc):
                 if search_position_variable[0]:
                     function=parse_while_control_structure(search_position_variable[1],defProc.lower(),list_blocks[-1].line.replace(' ','').strip().lower())
                     if function[0]:
-                        i+=(function[1]-2)
+                        i+=(function[1])
                     else:
                         return False
 
@@ -661,7 +663,7 @@ def parse_definition_defProc(list_blocks,defProc):
                                       
 
             elif list_blocks[i].string.lower() == "repeat":
-                pass
+                print('hola')
             i+=1   
     else:
         return False
@@ -696,34 +698,39 @@ def parse_definition(tokens, index):
         elif tokens[index].string.lower() == 'defproc':#Definimos la sintaxis y semantica para la defincion de las funciones
             
             if tokens[index+1].type == tokenize.NAME:
+                
                 if tokens[index+2].string == "(" and tokens[index].line.strip()[-1] == ")":
-
+                    
                     string_modified= tokens[index].line.strip().lower().replace('defproc','').replace(tokens[index+1].string.lower(),'').replace('(','').replace(')','').replace(" ","")
-
+                    
                     if len(string_modified)==0:
                         
                         dict_procedures[tokens[index+1].string.lower()]=[]
                         #list_dict_procedures.append({tokens[index+1].string:[]})
                         
                         search_position_variable=search_position(list_block,(tokens[index].start[0]+1,0))
+                        print(search_position_variable[1])
                         if search_position_variable[0]:#si tiene el mismo identificador que el del procedmiento asi sea sumandole 1 al start y end
+                            
                             if not(parse_definition_defProc(search_position_variable[1],tokens[index+1].string.lower())):
                                 return False
                             
                         else:
                             return False
                     else:
-
+                        
                         string_proc = list(tokenize.tokenize(BytesIO(string_modified.encode('utf-8')).readline))
 
                         if check_token_sequence_defProc(string_proc):
-
+                            
                             dict_procedures[tokens[index+1].string.lower()] = string_modified.replace('\n','').split(',')
                             #list_dict_procedures.append({tokens[index+1].string:string_modified.replace('\n','').split(',')})
                                  
                             search_position_variable = search_position(list_block,(tokens[index].start[0]+1,0))
                             if search_position_variable[0]:
+                                
                                 if not(parse_definition_defProc(search_position_variable[1],tokens[index+1].string.lower())):
+                                    print(search_position_variable[1])
                                     return False
                                        
                             else:
@@ -737,13 +744,16 @@ def parse_definition(tokens, index):
                 return False
         #-------------------------------------------------------------------------------------------------------------------------------------------
         #PARSER CODE BLOCKS
-        elif tokens[index].string.lower() == '{':
-            search_position_variable=search_position(list_block,(tokens[index].start[0]+1,0))
-            if search_position_variable[0]:
-                if not(parse_definition_defProc(search_position_variable[1],tokens[index+1].string.lower())):
-                    return False
-            else:
+        
+    elif tokens[index].string.lower() == '{':
+        
+        search_position_variable=search_position(list_block,(tokens[index].start[0]+1,0))
+        if search_position_variable[0]:
+            
+            if not(code_blocks(search_position_variable[1])):
                 return False
+        else:
+            return False
             
     return True
 

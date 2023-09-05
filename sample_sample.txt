@@ -1,4 +1,4 @@
 defProc putCB (c , b )
 {
-if not: can( walk(1 , west ) ) { walk(1 , west ) } else { nop() }
+repeat 5 times {}
 }

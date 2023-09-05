@@ -423,12 +423,15 @@ def parse_definition_defProc(list_blocks,defProc):
                 string_block_code=list_blocks[i].line.lower()[index_if+2:index_key].replace(' ','').strip()
 
                 if list_blocks[i+1].string == 'can':
-                    string_modified=string_block_code.replace('can','')[1:-1]
+                    string_modified=string_block_code.replace('can','')[1:-1].strip()
                     
                     list_tokens=list(tokenize.tokenize(BytesIO(string_modified.encode('utf-8')).readline))[1:-1]
                     list_string_modified= string_modified.replace(list_tokens[0].string.lower(),'')[1:-1].split(',')
-                    x=search_list_dict_built_in_function(list_tokens[0].string,list_dict_built_in_function,len(list_string_modified))
-
+                    
+                    if list_string_modified[0] == '' and list_tokens[0].string.lower()=='nop':
+                        x=[{"key":"nop","args":0,"type_1":"none"}]
+                    else:
+                        x=search_list_dict_built_in_function(list_tokens[0].string.lower(),list_dict_built_in_function,len(list_string_modified))
                     if len(x) !=0:#tenemos que verificar que el numero de  argumentos en la funcion sea el correcto
                              
                         if verify_types(x,list_string_modified,defProc):
@@ -439,41 +442,50 @@ def parse_definition_defProc(list_blocks,defProc):
 
                             list_tokens_2=list(tokenize.tokenize(BytesIO(first_block_code.encode('utf-8')).readline))[1:-1]
                             list_string_modified_2= first_block_code.replace(list_tokens_2[0].string.lower(),'')[1:-1].split(',')
-                            y=search_list_dict_built_in_function(list_tokens_2[0].string,list_dict_built_in_function,len(list_string_modified_2))
-                            
+                           
+                            if list_string_modified_2[0] == '' and list_tokens_2[0].string.lower()=='nop':
+                                y=[{"key":"nop","args":0,"type_1":"none"}]
+                            else:
+                                y=search_list_dict_built_in_function(list_tokens_2[0].string.lower(),list_dict_built_in_function,len(list_string_modified_2))
                             if len(y) !=0:
                                 
                                 if verify_types(y,list_string_modified_2,defProc):
                                     
                                     string_else_block=list_blocks[i].line[list_blocks[i].line.find("else")+4:].replace(' ','').strip()
-                                
-                                    if string_else_block[-1] == '}'and string_else_block[0] == '{':
+                                    
+                                    
+                                    list_tokens_3=list(tokenize.tokenize(BytesIO(string_else_block.encode('utf-8')).readline))[1:-1]
+                                    list_string_modified_3 = string_else_block.replace(list_tokens_3[0].string.lower(),'')[1:-1].split(',')
+                                    if list_string_modified_3[0]=='' and list_tokens_3[0].string.lower()== 'nop':#Aqui esta lo del nop IMPORTANTE 
+                                        z=[{"key":"nop","args":0,"type_1":"none"}]
+                                    else:
+                                        z=search_list_dict_built_in_function(list_tokens_3[0].string.lower(),list_dict_built_in_function,len(list_string_modified_3))
                                         
-                                        string_else_block=string_else_block[1:-1]
-                                        
-                                        list_tokens_3=list(tokenize.tokenize(BytesIO(string_else_block.encode('utf-8')).readline))[1:-1]
-                                        list_string_modified_3 = string_else_block.replace(list_tokens_3[0].string.lower(),'')[1:-1].split(',')
-                                        if list_string_modified_3[0]=='' and list_tokens_3[0].string== 'nop':#Aqui esta lo del nop IMPORTANTE 
-                                            z=[{"key":"nop","args":0,"type_1":"none"}]
-                                        else:
-                                            z=search_list_dict_built_in_function(list_tokens_3[0].string,list_dict_built_in_function,len(list_string_modified_3))
-                                        
-                                        if len(z) !=0:
+                                    if len(z) !=0:
                                             
-                                            if verify_types(z,list_string_modified_3,defProc):
-                                                i+=len(number_of_tokens)-1
-                                            else:
-                                                return False
+                                        if verify_types(z,list_string_modified_3,defProc):
+                                            i+=len(number_of_tokens)-1
                                         else:
                                             return False
+                                       
                                     else:
                                         return False 
                             else:
                                 return False
                     else:
                         return False
-                #elif list_blocks[i+1].string == 'facing':
-                #    string_modified=string_block_code.replace('facing','')[1:-1]
+                # elif list_blocks[i+1].string.lower() == 'facing' and list_blocks[i+2].string=='(' and list_blocks[i+3].string.lower() in values_parameters['orientation'] and list_blocks[i+4].string==')':
+                #     index_init=list_blocks[i].line.find('{')
+                #     index_end=list_blocks[i].line.find('}')
+                   
+                #     if index_init== -1 or index_end == -1:
+                #         return False
+    
+                #     string_modified = list_blocks[i].line[index_init+1:index_end].replace(' ','').strip()
+                #     number_of_tokens=list(tokenize.tokenize(BytesIO(string_modified.encode('utf-8')).readline))[1:-1]
+                    
+                    
+
                     
                                       
 
@@ -563,9 +575,9 @@ def parse_execution(tokens):
         index+=1
     return True
         
-# mac : /Users/fodepixofarfan/Downloads/LYM_PROY_0/sample_program.txts
+# mac : /Users/fodepixofarfan/Downloads/LYM_PROY_0/sample_program.txt
 # linux : /home/keith/Downloads/LYM_PROY_0/sample_program.txt
-tokens = tokenize_text_from_file("/home/keith/Downloads/LYM_PROY_0/sample_sample.txt")
+tokens = tokenize_text_from_file("/Users/fodepixofarfan/Downloads/LYM_PROY_0/sample_sample.txt")
 #try:
 #    print(parse_execution(tokens))
 #except:

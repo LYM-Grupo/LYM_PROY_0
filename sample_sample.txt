@@ -1,4 +1,5 @@
 defProc putCB (c , b )
 {
-while can(walk(1 , north ) ) { walk(1 , north ) }
+while not: can(walk(1 , north ) ) { walk(1 , north ) };
+jump(1,1)
 }

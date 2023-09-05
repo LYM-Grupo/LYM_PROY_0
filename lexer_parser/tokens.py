@@ -4,9 +4,9 @@
 import tokenize
 from io import BytesIO
 
-conditions=[{"key":"facing","args":1,"type_1": "orientation"},
-            {"key":"can","args":1,"type_1": "built_in_function"},
-            {"key":"not","args":1,"type_1": "condition"}]
+conditions=["facing","can","not"]
+#conditions=[{"key":"facing","args":1,"type_1": "orientation"},
+            #{"key":"can","args":1,"type_1": "built_in_function"}]
 
 values_parameters={"orientation":["north","south","east","west"],"direction":["left","right","around"]}
 dict_variables={}
@@ -34,7 +34,7 @@ def verify_types(x,list_string_modified,defProc):#IMPORTANTE: Esto es mal toca c
     for z in range(0,len(x)):
         if x[z]["args"] == 1:
             #print(dict_procedures)#IMPORTANTE Esto es mal 
-            if x[z]["type_1"] == "value" and (list_string_modified[0] in dict_variables.keys() or list_string_modified[0] in dict_procedures[defProc] or list_string_modified[0].isdigit()):
+            if x[z]["type_1"] == "value" and (list_string_modified[0].lower() in dict_variables.keys() or list_string_modified[0].lower() in dict_procedures[defProc] or list_string_modified[0].isdigit()):
                 result = True
             
             elif x[z]["type_1"] == "orientation" and list_string_modified[0].lower() in values_parameters["orientation"]:
@@ -45,7 +45,7 @@ def verify_types(x,list_string_modified,defProc):#IMPORTANTE: Esto es mal toca c
         
         elif x[z]["args"] == 2:
             
-            if x[z]["type_1"] == "value" and (list_string_modified[0] in dict_variables.keys() or list_string_modified[0] in dict_procedures[defProc] or list_string_modified[0].isdigit()):
+            if x[z]["type_1"] == "value" and (list_string_modified[0].lower() in dict_variables.keys() or list_string_modified[0].lower() in dict_procedures[defProc] or list_string_modified[0].isdigit()):
                 
                 if x[z]["type_2"] == "orientation" and (list_string_modified[1].lower() in values_parameters["orientation"]):
                     result = True
@@ -53,7 +53,7 @@ def verify_types(x,list_string_modified,defProc):#IMPORTANTE: Esto es mal toca c
                 elif x[z]["type_2"] == "direction" and (list_string_modified[1].lower() in values_parameters["direction"]):
                     result = True
 
-                elif x[z]["type_2"] == "value" and (list_string_modified[1] in dict_variables.keys() or list_string_modified[1] in dict_procedures[defProc] or list_string_modified[1].isdigit()):
+                elif x[z]["type_2"] == "value" and (list_string_modified[1].lower() in dict_variables.keys() or list_string_modified[1].lower() in dict_procedures[defProc] or list_string_modified[1].isdigit()):
                     result = True
         else:
             return False
@@ -181,28 +181,93 @@ def check_token_sequence_defProc_brackets(tokens):
         else:
             return False
     return result
-
-def parse_while_control_structure(list_blocks,string):
+#IMPORTANTE: ARREGLAR TODOS LOS NOP
+def parse_while_control_structure(list_blocks,string,last_line):
     result= False,len(list_blocks)
     i=0
     
     length = len(list_blocks)-1 
     while i< length:
 
-        if list_blocks[i].line.strip()[-1] == '}' or list_blocks[i].line.strip()[-1] == ';':
+        if (list_blocks[i].line.strip()[-1] == '}' and list_blocks[i].line.replace(' ','').strip().lower()==last_line) or (list_blocks[i].line.strip()[-1] == ';' and list_blocks[i].line.replace(' ','').strip().lower()!=last_line):
 
-            if list_blocks[i+1].string.lower() == "facing" and list_blocks[i+2].string.lower() =='(' and list_blocks[i+3].string.lower() in values_parameters["orientation"] and list_blocks[i+4].string.lower() == ')':
+                #search_list_dict_built_in_function()
+            if list_blocks[i+1].string.lower() == "not" and list_blocks[i+2].string.lower() == ':':
+                
+                if list_blocks[i+3].string.lower() == "facing" and list_blocks[i+4].string.lower() =='(' and list_blocks[i+5].string.lower() in values_parameters["orientation"] and list_blocks[i+6].string.lower() == ')':
+                    string_block_code = list_blocks[i].line[list_blocks[i].line.find('{')+1:list_blocks[i].line.find('}')].replace(' ','')
+                    list_tokens=list(tokenize.tokenize(BytesIO(string_block_code.encode('utf-8')).readline))[1:-1]
+                    string_modified=string_block_code.replace(list_tokens[0].string.lower(),'').strip()[1:-1]
+                        
+                    if len(string_modified)!=0:
+                        list_string_modified= string_modified.split(',')
+                        x= search_list_dict_built_in_function(list_tokens[0].string.lower(),list_dict_built_in_function,len(list_string_modified))
+                        if len(x)!=0:
+                            if verify_types(x,list_string_modified,string):
+                                return True ,len(list_blocks)
+                            else:
+                                return False ,len(list_blocks)
+                    else:
+                        if list_tokens_2[0].string.lower() != "nop":
+                            return False ,len(list_blocks)
+                        else:
+                            result = True , len(list_blocks)
+                
+                elif list_blocks[i+3].string.lower() == "can" and list_blocks[i+4].string.lower() == '(':
+                    while_index = list_blocks[i].line.find('while')
+                    string_modified = list_blocks[i].line[while_index+5:list_blocks[i].line.find('{',while_index)].replace('can','').replace('not','').replace(':','').strip()
+                    
+                    if string_modified[-1] == ')':
+                        string_modified = string_modified[1:-1].replace(' ','')
+                        print(string_modified)
+                        list_tokens=list(tokenize.tokenize(BytesIO(string_modified.encode('utf-8')).readline))[1:-1]
+                        
+                        string_modified = string_modified.replace(list_tokens[0].string.lower(),'').strip()[1:-1]
 
-                    pass
+                        if len(string_modified)!=0:
+                            list_string_modified =string_modified.split(',')
+                            x = search_list_dict_built_in_function(list_tokens[0].string.lower(),list_dict_built_in_function,len(list_string_modified))
+                            
+                            if len(x)!=0:
+                                
+                                if verify_types(x,list_string_modified,string):
+
+                                    string_modified_2=list_blocks[i].line[list_blocks[i].line.find('{')+1:list_blocks[i].line.find('}')].replace(' ','')
+                                    list_tokens_2=list(tokenize.tokenize(BytesIO(string_modified_2.encode('utf-8')).readline))[1:-1]
+                                    string_modified_2= string_modified_2.replace(list_tokens_2[0].string.lower(),'').strip()[1:-1]
+                                    
+                                    if len(string_modified_2) !=0:
+                                        list_string_modified_2 = string_modified_2.split(',')
+                                        y = search_list_dict_built_in_function(list_tokens_2[0].string.lower(),list_dict_built_in_function,len(list_string_modified_2))
+                                        if len(y)!=0:
+                                            
+                                            if verify_types(y,list_string_modified_2,string):
+                                                return True ,len(list_blocks)
+                                            else:
+                                                return False ,len(list_blocks)
+                                    else:
+                                        if list_tokens_2[0].string.lower() != "nop":
+                                            return False ,len(list_blocks)
+                                        else:
+                                            result = True , len(list_blocks)
+                                else:
+                                    return False,len(list_blocks)
+                                
+                            else:
+                                return False,len(list_blocks)
+                        else:
+                            if list_tokens[0].string.lower() != "nop":# Areglar esto en los otros
+                                result= True,len(list_blocks) 
+                            else:
+                                result = True , len(list_blocks)             
 
             elif list_blocks[i+1].string.lower() == "can" and list_blocks[i+2].string.lower() == '(':
                 while_index = list_blocks[i].line.find('while')
-                #first_key_index =list_blocks[i].line.find('{',while_index)
-
-                string_modified= list_blocks[i].line[while_index+5:list_blocks[i].line.find('{',while_index)].replace('can','').strip()
+                string_modified = list_blocks[i].line[while_index+5:list_blocks[i].line.find('{',while_index)].replace('can','').strip()
                 
                 if string_modified[-1] == ')':
                     string_modified = string_modified[1:-1].replace(' ','')
+                    print(string_modified)
                     list_tokens=list(tokenize.tokenize(BytesIO(string_modified.encode('utf-8')).readline))[1:-1]
                     
                     string_modified = string_modified.replace(list_tokens[0].string.lower(),'').strip()[1:-1]
@@ -225,23 +290,45 @@ def parse_while_control_structure(list_blocks,string):
                                     if len(y)!=0:
                                         
                                         if verify_types(y,list_string_modified_2,string):
-                                            result = True ,len(list_blocks)
+                                            return True ,len(list_blocks)
                                         else:
                                             return False ,len(list_blocks)
+                                else:
+                                    if list_tokens_2[0].string.lower() != "nop":
+                                        return False ,len(list_blocks)
+                                    else:
+                                        result = True , len(list_blocks)
                             else:
                                 return False,len(list_blocks)
                             
                         else:
                             return False,len(list_blocks)
                     else:
-                        if list_tokens[0].lower() != "nop":
+                        if list_tokens[0].string.lower() != "nop":# Areglar esto en los otros
+                            result= True,len(list_blocks) 
+                        else:
+                            result = True , len(list_blocks)
+
+            elif list_blocks[i+1].string.lower() == "facing" and list_blocks[i+2].string.lower() =='(' and list_blocks[i+3].string.lower() in values_parameters["orientation"] and list_blocks[i+4].string.lower() == ')':
+                string_block_code = list_blocks[i].line[list_blocks[i].line.find('{')+1:list_blocks[i].line.find('}')].replace(' ','')
+                list_tokens=list(tokenize.tokenize(BytesIO(string_block_code.encode('utf-8')).readline))[1:-1]
+                string_modified=string_block_code.replace(list_tokens[0].string.lower(),'').strip()[1:-1]
+                
+                if len(string_modified)!=0:
+                    list_string_modified= string_modified.split(',')
+                    x= search_list_dict_built_in_function(list_tokens[0].string.lower(),list_dict_built_in_function,len(list_string_modified))
+                    if len(x)!=0:
+                        if verify_types(x,list_string_modified,string):
+                            return True ,len(list_blocks)
+                        else:
                             return False ,len(list_blocks)
+                else:
+                    if list_tokens_2[0].string.lower() != "nop":
+                        return False ,len(list_blocks)
+                    else:
+                        result = True , len(list_blocks)
 
-                #search_list_dict_built_in_function()
-            elif list_blocks[i+1].string.lower() == "not":
-                pass
 
-            
         elif list_blocks[i].line.strip()[-1] == '{':
             pass
         i+=1
@@ -354,9 +441,9 @@ def parse_definition_defProc(list_blocks,defProc):
                 
                 search_position_variable = search_position(list_while_blocks,(list_blocks[i].start[0],list_blocks[i].start[1]))
                 if search_position_variable[0]:
-                    function=parse_while_control_structure(search_position_variable[1],defProc.lower())
+                    function=parse_while_control_structure(search_position_variable[1],defProc.lower(),list_blocks[-1].line.replace(' ','').strip().lower())
                     if function[0]:
-                        i+=function[1]
+                        i+=(function[1]-2)
                     else:
                         return False
 

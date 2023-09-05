@@ -31,37 +31,74 @@ list_dict_built_in_function=[
 
 def verify_types(x,list_string_modified,defProc):#IMPORTANTE: Esto es mal toca corregirlo plus toca corregir lo del punto y coma 
     result=False
-    for z in range(0,len(x)):
-        if x[z]["args"] == 1:
-            
-            if x[z]["type_1"] == "value" and (list_string_modified[0].lower() in dict_variables.keys() or list_string_modified[0].lower() in dict_procedures[defProc] or list_string_modified[0].isdigit()):
-                result = True
-            
-            elif x[z]["type_1"] == "orientation" and list_string_modified[0].lower() in values_parameters["orientation"]:
-                result = True
-            
-            elif x[z]["type_1"] == "direction" and (list_string_modified[0].lower() in values_parameters["direction"]):
-                result = True
+    if defProc.lower() in dict_procedures.keys():
 
-        
-        elif x[z]["args"] == 2:
-
-            if x[z]["type_1"] == "value" and (list_string_modified[0].lower() in dict_variables.keys() or list_string_modified[0].lower() in dict_procedures[defProc] or list_string_modified[0].isdigit()):
+        for z in range(0,len(x)):
+            if x[z]["args"] == 1:
                 
-                if x[z]["type_2"] == "orientation" and (list_string_modified[1].lower() in values_parameters["orientation"]):
+                if x[z]["type_1"] == "value" and (list_string_modified[0].lower() in dict_variables.keys() or list_string_modified[0].lower() in dict_procedures[defProc] or list_string_modified[0].isdigit()):
                     result = True
                 
-                elif x[z]["type_2"] == "direction" and (list_string_modified[1].lower() in values_parameters["direction"]):
+                elif x[z]["type_1"] == "orientation" and list_string_modified[0].lower() in values_parameters["orientation"]:
+                    result = True
+                
+                elif x[z]["type_1"] == "direction" and (list_string_modified[0].lower() in values_parameters["direction"]):
                     result = True
 
-                elif x[z]["type_2"] == "value" and (list_string_modified[1].lower() in dict_variables.keys() or list_string_modified[1].lower() in dict_procedures[defProc] or list_string_modified[1].isdigit()):
+            
+            elif x[z]["args"] == 2:
+
+                if x[z]["type_1"] == "value" and (list_string_modified[0].lower() in dict_variables.keys() or list_string_modified[0].lower() in dict_procedures[defProc] or list_string_modified[0].isdigit()):
+                    
+                    if x[z]["type_2"] == "orientation" and (list_string_modified[1].lower() in values_parameters["orientation"]):
+                        result = True
+                    
+                    elif x[z]["type_2"] == "direction" and (list_string_modified[1].lower() in values_parameters["direction"]):
+                        result = True
+
+                    elif x[z]["type_2"] == "value" and (list_string_modified[1].lower() in dict_variables.keys() or list_string_modified[1].lower() in dict_procedures[defProc] or list_string_modified[1].isdigit()):
+                        result = True
+            elif  x[z]["args"] == 0 and x[z]["type_1"]=='none':
+                    
                     result = True
-        elif  x[z]["args"] == 0 and x[z]["type_1"]=='none':
+            else:
+                return False
+        return result
+    elif defProc.lower()=='':
+
+        for z in range(0,len(x)):
+            if x[z]["args"] == 1:
                 
-                result = True
-        else:
-            return False
-    return result
+                if x[z]["type_1"] == "value" and (list_string_modified[0].lower() in dict_variables.keys() or list_string_modified[0].isdigit()):
+                    result = True
+                
+                elif x[z]["type_1"] == "orientation" and list_string_modified[0].lower() in values_parameters["orientation"]:
+                    result = True
+                
+                elif x[z]["type_1"] == "direction" and (list_string_modified[0].lower() in values_parameters["direction"]):
+                    result = True
+
+            
+            elif x[z]["args"] == 2:
+
+                if x[z]["type_1"] == "value" and (list_string_modified[0].lower() in dict_variables.keys() or list_string_modified[0].isdigit()):
+                    
+                    if x[z]["type_2"] == "orientation" and (list_string_modified[1].lower() in values_parameters["orientation"]):
+                        result = True
+                    
+                    elif x[z]["type_2"] == "direction" and (list_string_modified[1].lower() in values_parameters["direction"]):
+                        result = True
+
+                    elif x[z]["type_2"] == "value" and (list_string_modified[1].lower() in dict_variables.keys() or list_string_modified[1].isdigit()):
+                        result = True
+            elif  x[z]["args"] == 0 and x[z]["type_1"]=='none':
+                    
+                    result = True
+            else:
+                return False
+        return result
+    else:
+        return False
 
 def search_list_dict_built_in_function(key,list_dict,len_arguments):
     list_posibilities=[] 
@@ -309,9 +346,8 @@ def parse_while_control_structure(list_blocks,string,last_line):
             pass
         i+=1
     return result
-def parse_if_control_structure(line,defProc):
+def code_blocks():
     pass
-
 def parse_definition_defProc(list_blocks,defProc):
     #Faltan hacer varias cosas porque las funciones tambien permiten recursion de las misma funcion y llamado de otras funcion dentro de la misma funcion 
     #Falta otra cosa que es la verificacion del orden de los argumentos de una built-in function
@@ -699,6 +735,16 @@ def parse_definition(tokens, index):
                 
             else:
                 return False
+        #-------------------------------------------------------------------------------------------------------------------------------------------
+        #PARSER CODE BLOCKS
+        elif tokens[index].string.lower() == '{':
+            search_position_variable=search_position(list_block,(tokens[index].start[0]+1,0))
+            if search_position_variable[0]:
+                if not(parse_definition_defProc(search_position_variable[1],tokens[index+1].string.lower())):
+                    return False
+            else:
+                return False
+            
     return True
 
 #TokenInfo(type=63 (ENCODING), string='utf-8', start=(0, 0), end=(0, 0), line='')

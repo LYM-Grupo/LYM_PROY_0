@@ -18,7 +18,7 @@ conditions=["facing","can","not"]
 values_parameters={"orientation":["north","south","east","west"],"direction":["left","right","around"]}
 dict_variables={}
 dict_procedures={}
-list_built_in_function=["jump","walk","leap","turn","turninto","drop","get","grab","letGo","nop"]
+list_built_in_function=["jump","walk","leap","turn","turninto","drop","get","grab","letgo","nop"]
 list_dict_built_in_function=[   
     {"key":"walk","args":1,"type_1":"value"},
     {"key":"walk","args":2,"type_1":"value","type_2":"direction"},
@@ -31,7 +31,7 @@ list_dict_built_in_function=[
     {"key":"drop","args":1,"type_1":"value"},
     {"key":"get","args":1,"type_1":"value"},
     {"key":"grab","args":2,"type_1":"value"},
-    {"key":"letGo","args":1,"type_1":"value"},
+    {"key":"letgo","args":1,"type_1":"value"},
     {"key":"nop","args":0,"type_1":"none"},
     {"key":"jump","args":2,"type_1":"value","type_2":"value"}
 ]

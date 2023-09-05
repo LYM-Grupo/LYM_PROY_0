@@ -4,7 +4,6 @@ defVar y 0
 defVar one 0
 defVar letGo 8
 defProc putCB (c , b )
-if facing(north) { walk(1 , west ) } else { nop() }
 {
 drop( c ) ;
 letGo ( b ) ;

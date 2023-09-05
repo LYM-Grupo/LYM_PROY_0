@@ -474,16 +474,24 @@ def parse_definition_defProc(list_blocks,defProc):
                                 return False
                     else:
                         return False
-                # elif list_blocks[i+1].string.lower() == 'facing' and list_blocks[i+2].string=='(' and list_blocks[i+3].string.lower() in values_parameters['orientation'] and list_blocks[i+4].string==')':
-                #     index_init=list_blocks[i].line.find('{')
-                #     index_end=list_blocks[i].line.find('}')
+                elif list_blocks[i+1].string.lower() == 'facing' and list_blocks[i+2].string=='(' and list_blocks[i+3].string.lower() in values_parameters['orientation'] and list_blocks[i+4].string==')':
+                    index_init=list_blocks[i].line.find('{')
+                    index_end=list_blocks[i].line.find('}')
                    
-                #     if index_init== -1 or index_end == -1:
-                #         return False
+                    if index_init== -1 or index_end == -1:
+                        return False
     
-                #     string_modified = list_blocks[i].line[index_init+1:index_end].replace(' ','').strip()
-                #     number_of_tokens=list(tokenize.tokenize(BytesIO(string_modified.encode('utf-8')).readline))[1:-1]
+                    string_modified = list_blocks[i].line[index_init+1:index_end].replace(' ','').strip()
                     
+                    list_tokens=list(tokenize.tokenize(BytesIO(string_modified.encode('utf-8')).readline))[1:-1]
+                    list_string_modified = string_modified.replace(number_of_tokens[0].string,'').replace(' ','') .strip()[1:-1].split(',')
+                    
+                    if list_string_modified[0] == '' and list_tokens[0].string.lower()=='nop':
+                        x=[{"key":"nop","args":0,"type_1":"none"}]
+                    else:
+                        x=search_list_dict_built_in_function(list_tokens[0].string.lower(),list_dict_built_in_function,len(list_string_modified))
+                    print(x)
+                    #if string_modified[0].string.lower()=='' and lis
                     
 
                     

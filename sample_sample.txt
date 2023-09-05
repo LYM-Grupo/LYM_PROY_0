@@ -1,5 +1,4 @@
 defProc putCB (c , b )
 {
-while not: can(walk(1 , north ) ) { walk(1 , north ) };
-jump(1,1)
+if can(walk(1 , west ) ) { walk(1 , west ) } else { nop () }
 }
